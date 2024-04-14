@@ -1,0 +1,25 @@
+---
+- name: Download OpenFaaS Helm Chart
+  unarchive:
+    src: openfaas-{{ openfaas_helm_version }}.tgz
+    dest: /home/{{ ansible_user }}/app
+    creates: /home/{{ ansible_user }}/app/openfaas
+
+- name: Upload other cluster's kubeconfig
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ ansible_user }}/app/openfaas/kubeconfig/
+  with_fileglob:
+    - "*-kubeconfig"
+  when: "inventory_hostname not in item"
+
+- name: Deploy OpenFaaS Helm Chart
+  kubernetes.core.helm:
+    name: openfaas
+    # chart_ref: openfaas-{{ openfaas_helm_version }}.tgz
+    chart_ref: /home/{{ ansible_user }}/app/openfaas
+    release_namespace: openfaas
+    create_namespace: true
+    wait: True
+    timeout: 600s
+    kubeconfig: /etc/rancher/k3s/k3s.yaml

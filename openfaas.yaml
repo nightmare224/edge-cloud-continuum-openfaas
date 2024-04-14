@@ -1,0 +1,17 @@
+---
+- name: Fetch the kubeconfig file from all Kubernetes server
+  hosts: 
+    - k3s-server
+    - k8s-master
+  tasks:
+    - fetch:
+        src: "{{ kubeconfig_path }}"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
+        flat: true
+
+
+- name: Install OpenFaaS on Kubernetes
+  hosts: k3s-server
+  roles:
+    - common
+    - openfaas

@@ -1,0 +1,6 @@
+---
+- name: Ensure the app directory exists
+  file:
+    path: /home/{{ ansible_user }}/app
+    state: directory
+    mode: '0755'
