@@ -1,0 +1,49 @@
+---
+- name: Download K3S
+  get_url:
+    url: https://github.com/k3s-io/k3s/releases/download/v1.29.2+k3s1/k3s-arm64
+    dest: /usr/local/bin/k3s
+    mode: '0755'
+  become: true
+
+- name: Copy K3S master config file
+  template:
+    src: config-master.yaml
+    dest: /home/{{ ansible_user }}/infra/config-master.yaml
+  when: "'k3s_master' in group_names"
+
+- name: Start K3S master
+  command: k3s server --config /home/{{ ansible_user }}/infra/config-server.yaml
+  when: "'k3s_master' in group_names"
+
+- name: Fetch the token of K3S master
+  fetch:
+    src: /var/lib/rancher/k3s/server/token
+    dest: "{{ role_path }}/files/token_{{ group_names[0] }}"
+    flat: true
+  become: true
+  when: "'k3s_master' in group_names"
+
+- name: Fetch the hostname of K3S master
+  ansible.builtin.lineinfile:
+    path: "{{ role_path }}/files/hostname_{{ group_names[0] }}"
+    line: "{{ ansible_host }}"
+    create: true
+  delegate_to: localhost
+  when: "'k3s_master' in group_names"
+
+- name: Start K3S worker
+  command: k3s agent --token {{ k3s_token }} --server {{ k3s_master_url }}
+  vars:
+    k3s_token: "{{ lookup('file', 'token_' + group_names[0]) }}"
+    k3s_master_url: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:6443"
+  when: "'k3s_worker' in group_names"
+
+
+# - name: print
+#   debug:
+#     msg: "{{ k3s_master_url }}"
+#   vars:
+#     k3s_token: "{{ lookup('file', 'token_' + group_names[0]) }}"
+#     k3s_master_url: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:6443"
+#   when: "'k3s_worker' in group_names"

@@ -1,4 +1,10 @@
 ---
+- name: Ensure the infra directory exists
+  file:
+    path: /home/{{ ansible_user }}/infra
+    state: directory
+    mode: '0755'
+
 - name: Ensure the app directory exists
   file:
     path: /home/{{ ansible_user }}/app
