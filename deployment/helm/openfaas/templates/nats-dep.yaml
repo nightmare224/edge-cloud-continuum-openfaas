@@ -1,0 +1,72 @@
+{{- if and (or .Values.async (or .Values.eventSubscription.metering.enabled .Values.eventSubscription.auditing.enabled)) (not .Values.nats.external.enabled ) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ template "openfaas.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: nats
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: nats
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "false"
+      labels:
+        app: nats
+    spec:
+      containers:
+      - name:  nats
+        resources:
+          {{- .Values.nats.resources | toYaml | nindent 12 }}
+        {{- if eq .Values.queueMode "jetstream" }}
+        image: {{ .Values.nats.image }}
+        {{- else }}
+        image: {{ .Values.stan.image }}
+        {{- end }}
+        imagePullPolicy: {{ .Values.openfaasImagePullPolicy }}
+        ports:
+        - containerPort: 4222
+          protocol: TCP
+        {{- if not (eq .Values.queueMode "jetstream") }}
+        command: ["/nats-streaming-server"]
+        {{- end }}
+        args:
+          {{- if eq .Values.queueMode "jetstream" }}
+          - --js
+          {{- else}}
+          - --store
+          - memory
+          - --cluster_id
+          - faas-cluster
+          {{- end }}
+        {{- if .Values.securityContext }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: /tmp/nats
+          name: nats-data
+      volumes:
+      - name: nats-data
+        emptyDir: {}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}

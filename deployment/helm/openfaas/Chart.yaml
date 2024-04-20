@@ -1,0 +1,29 @@
+apiVersion: v2
+dependencies:
+- condition: prometheus.nodeExporter.enabled
+  name: prometheus-node-exporter
+  repository: ""
+  version: 4.32.0
+description: OpenFaaS - Serverless Functions Made Simple. Hsiang-ling modified a bit
+  for my thesis.
+home: https://www.openfaas.com
+icon: https://raw.githubusercontent.com/openfaas/media/master/OpenFaaS_logo_stacked_opaque.png
+keywords:
+- serverless
+- functions
+- platform
+- faas
+maintainers:
+- email: alex@openfaas.com
+  name: alexellis
+- email: han@openfaas.com
+  name: welteki
+- email: nicole1999224@gmail.com
+  name: hsiang-ling
+name: openfaas
+sources:
+- https://github.com/openfaas/faas
+- https://github.com/openfaas/faas-netes
+- https://github.com/nightmare224/faas-netes
+type: application
+version: 14.2.31
