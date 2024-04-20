@@ -22,4 +22,4 @@
     create_namespace: true
     wait: True
     timeout: 600s
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    kubeconfig: "{{ kubeconfig_path }}"
