@@ -1,1 +1,0 @@
-# edge-cloud-continuum-openfaas
