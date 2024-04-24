@@ -1,0 +1,4 @@
+---
+openfaas_gateway_image: ghcr.io/openfaas/gateway:0.27.6
+openfaas_netes_image: ghcr.io/openfaas/faas-netes:0.18.3
+offload_enabled: false
