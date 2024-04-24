@@ -38,6 +38,14 @@
 #     - "*-kubeconfig"
 #   when: "inventory_hostname not in item"
 
+- name: Copy cluster's kubeconfig file to Helm Chart
+  copy:
+    src: "{{ item }}"
+    dest: "{{ role_path }}/files/openfaas/kubeconfig/"
+  with_fileglob:
+    - "*-kubeconfig"
+  delegate_to: localhost
+
 - name: Deploy OpenFaaS Helm Chart
   kubernetes.core.helm:
     name: openfaas

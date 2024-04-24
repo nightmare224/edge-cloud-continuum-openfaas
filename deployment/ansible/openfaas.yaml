@@ -5,8 +5,8 @@
     - name: From the on-premsie cluster
       fetch:
         src: "{{ kubeconfig_path }}"
-        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
-        # dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
+        # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
         flat: true
       # when: 
       #   "('on_premise' in group_names) and ('master' in group_names)"
@@ -30,8 +30,8 @@
       - name: Save kubeconfig
         copy:
           content: "{{ resp_kubeconfig['aks'][0]['kube_config'] }}"
-          dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
-          # dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
+          # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
+          dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
       # when: "'aks' in group_names"
       
 
