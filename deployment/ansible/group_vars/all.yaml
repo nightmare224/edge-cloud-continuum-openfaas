@@ -1,0 +1,8 @@
+---
+# Which version of OpenFaaS Helm Chart to deploy
+openfaas_helm_version: 14.2.31
+hostalias:
+- ip: 10.211.55.24
+  hostname: gateway.openfaas.cloud
+- ip: 172.171.39.226
+  hostname: cloud2.aks.dev

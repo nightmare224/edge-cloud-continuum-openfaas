@@ -71,9 +71,7 @@ spec:
       {{- range $host := .Values.offload.hostalias }}
       - ip: {{ $host.ip }}
         hostnames:
-        {{- range $hostname := $host.hostnames }}
-        - {{ $hostname }}
-        {{- end }}
+        - {{ $host.hostname }}
       {{- end }}
       {{- end }}
       containers:

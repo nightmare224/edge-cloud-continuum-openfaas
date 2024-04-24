@@ -1,43 +1,4 @@
 ---
-# - name: Download OpenFaaS Helm Chart
-#   unarchive:
-#     src: openfaas-{{ openfaas_helm_version }}.tgz
-#     dest: /home/{{ ansible_user }}/app
-#     creates: /home/{{ ansible_user }}/app/openfaas
-
-# - name: Upload other cluster's kubeconfig
-#   copy:
-#     src: "{{ item }}"
-#     dest: /home/{{ ansible_user }}/app/openfaas/kubeconfig/
-#   with_fileglob:
-#     - "*-kubeconfig"
-#   when: "inventory_hostname not in item"
-
-# - name: Deploy OpenFaaS Helm Chart
-#   kubernetes.core.helm:
-#     name: openfaas
-#     chart_ref: /home/{{ ansible_user }}/app/openfaas
-#     values:
-#       gateway:
-#         image: "{{ openfaas_gateway_image }}"
-#       faasnetes:
-#         image: "{{ openfaas_netes_image }}"
-#       offload:
-#         enabled: "{{ offload_enabled }}"
-#     release_namespace: openfaas
-#     create_namespace: true
-#     wait: True
-#     timeout: 600s
-#     kubeconfig: "{{ kubeconfig_path }}"
-
-# - name: Upload other cluster's kubeconfig
-#   copy:
-#     src: "{{ item }}"
-#     dest: /home/{{ ansible_user }}/app/openfaas/kubeconfig/
-#   with_fileglob:
-#     - "*-kubeconfig"
-#   when: "inventory_hostname not in item"
-
 - name: Copy cluster's kubeconfig file to Helm Chart
   copy:
     src: "{{ item }}"
@@ -57,6 +18,14 @@
         image: "{{ openfaas_netes_image }}"
       offload:
         enabled: "{{ offload_enabled }}"
+        hostalias: "{{ hostalias }}"
+      ingress:
+        hosts:
+        - host: "{{ hostname }}"
+          serviceName: gateway
+          servicePort: 8080
+          path: /
+        ingressClassName: "{{ ingressClassName }}"
     release_namespace: openfaas
     create_namespace: true
     wait: True

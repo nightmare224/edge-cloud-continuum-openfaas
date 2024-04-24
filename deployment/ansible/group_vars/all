@@ -1,3 +1,0 @@
----
-# Which version of OpenFaaS Helm Chart to deploy
-openfaas_helm_version: 14.2.31
