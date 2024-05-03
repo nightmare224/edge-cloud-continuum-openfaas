@@ -79,12 +79,20 @@ data:
     groups:
       - name: openfaas
         rules:
-        - alert: RequestBecomeTooSlow
+        - alert: SlowRequest
           expr: (sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[10s]) / increase(gateway_functions_seconds_count{code="200"}[10s])) / sum by (function_name) (gateway_function_fastest_response)) > 8
           for: 20s
           labels:
             service: gateway
-            serverity: major          
+            serverity: major
+            receiver: scale
+        - alert: IdleService
+          expr: sum(gateway_service_count > 1) by (function_name) and ((sum(increase(gateway_functions_seconds_count{code="200"}[10s])) by (function_name) == 0) or ((sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[10s]) / increase(gateway_functions_seconds_count{code="200"}[10s])) / sum by (function_name) (gateway_function_fastest_response)) < 2))
+          for: 20s
+          labels:
+            service: gateway
+            serverity: major
+            receiver: scale
 
 {{- end }}
 {{- end }}

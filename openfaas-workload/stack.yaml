@@ -25,7 +25,9 @@ functions:
       model_name: "resnet50-v1-12"
       s3_bucket_name: "faas-workload-model-decomposition"
       s3_object_name: "resnet50-v1-12.onnx"
-    # labels:
+    labels:
+      com.openfaas.scale.min: 1
+      com.openfaas.scale.max: 2
       # com.openfaas.scale.type: rps
       # com.openfaas.scale.target: 50
       # openfaas.scale.target-proportion: 0.90 

@@ -1,4 +1,4 @@
 ---
-openfaas_gateway_image: nightmare224/faas-gateway-offload:0.0.14
+openfaas_gateway_image: nightmare224/faas-gateway-offload:0.0.17
 openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.44
 offload_enabled: true

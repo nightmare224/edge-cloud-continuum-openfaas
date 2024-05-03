@@ -20,11 +20,11 @@ data:
       group_wait: 5s
       group_interval: 10s
       repeat_interval: 30s
-      receiver: scale-up
+      receiver: scale
       routes:
       - match:
           service: gateway
-          receiver: scale-up
+          receiver: scale
           severity: major
 
     inhibit_rules:
@@ -35,10 +35,10 @@ data:
       equal: ['alertname', 'cluster', 'service']
 
     receivers:
-    - name: 'scale-up'
+    - name: 'scale'
       webhook_configs:
         - url: http://gateway.{{ .Release.Namespace }}:8080/system/alert
-          send_resolved: true
+          send_resolved: false
           {{- if .Values.basic_auth }}
           http_config:
             basic_auth:
