@@ -4,3 +4,6 @@
 [submodule "openfaas-netes"]
 	path = openfaas-netes
 	url = https://github.com/nightmare224/faas-netes.git
+[submodule "faasd"]
+	path = faasd
+	url = https://github.com/nightmare224/faasd

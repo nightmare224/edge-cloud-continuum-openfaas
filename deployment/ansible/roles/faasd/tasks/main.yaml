@@ -1,0 +1,70 @@
+- name: Enviornment config
+  sysctl:
+    name: net.ipv4.conf.all.forwarding
+    value: '1'
+    sysctl_set: true
+
+- name: Install dependency
+  block:
+  - name: Install required packages
+    apt:
+      name:
+        - curl
+        - runc
+        -  bridge-utils
+        - iptables
+      state: latest
+      update_cache: yes
+  - name: Create /opt/cni/bin/ directory if it does not exist
+    file:
+      path: /opt/cni/bin/
+      state: directory
+      mode: '0755'
+  - name: Install cni plugins
+    unarchive:
+      src: cni-plugins-linux-arm64-{{ cni_version }}.tgz
+      dest: /opt/cni/bin/
+  - name: Install containerd
+    unarchive:
+      src: containerd-{{ containerd_version }}-linux-arm64.tar.gz
+      dest: /usr/local/bin/
+  - name: Config containerd
+    copy:
+      src: containerd-{{ containerd_version }}.service
+      dest: /etc/systemd/system/containerd.service
+  - name: Start containerd
+    systemd_service:
+      state: started
+      enabled: true
+      name: containerd
+      masked: no
+
+- name: Upload faasd required file
+  copy:
+    src: "{{ item.src }}"
+    dest: /home/{{ ansible_user }}/app/{{ item.dest }}
+  loop:
+    - src: faasd/docker-compose.yaml
+      dest: faasd/
+    - src: faasd/prometheus.yml
+      dest: faasd/
+    - src: faasd/resolv.conf
+      dest: faasd/
+    - src: faasd/hack/faasd.service
+      dest: faasd/hack/
+    - src: faasd/hack/faasd-provider.service
+      dest: faasd/hack/
+  tags: faasd_update
+
+- name: Upload faasd binary execution file
+  copy:
+    src: faasd/faasd
+    dest: /usr/local/bin/faasd
+    mode: '0755'
+  tags: faasd_update
+
+- name: Start faasd
+  command: faasd install
+  args:
+      chdir: /home/{{ ansible_user }}/app/faasd
+  tags: faasd_update

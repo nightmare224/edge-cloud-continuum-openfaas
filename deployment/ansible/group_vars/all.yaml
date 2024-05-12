@@ -1,5 +1,7 @@
 ---
 # Which version of OpenFaaS Helm Chart to deploy
+cni_version: v0.9.1
+containerd_version: v1.7.0
 openfaas_helm_version: 14.2.31
 hostalias:
 - ip: 10.211.55.24

@@ -1,0 +1,7 @@
+---
+- name: Install faasd
+  hosts: edge
+  roles:
+    - role: common 
+    - role: faasd
+      become: yes
