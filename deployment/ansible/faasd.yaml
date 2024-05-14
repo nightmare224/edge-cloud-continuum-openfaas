@@ -1,4 +1,25 @@
 ---
+- name: Fetch p2p public key to all faasd node
+  hosts: edge
+  tasks:
+    - name: Transfer execution file for generate keypair
+      copy:
+        src: "{{ playbook_dir }}/roles/faasd/files/generate-p2p-keypair-arm64"
+        dest: /tmp/
+        mode: '0755'
+    - name: Generate keypair
+      command: /tmp/generate-p2p-keypair-arm64
+    - name: Fetch public key
+      fetch:
+        src: /tmp/pubKey
+        dest: "{{ playbook_dir }}/roles/faasd/files/pubKey/{{ ansible_host }}"
+        flat: true
+    - name: Scatter p2p public key to all faasd node
+      copy:
+        src: "{{ playbook_dir }}/roles/faasd/files/pubKey/"
+        dest: /tmp/faasd-p2p/pubKey-peer/
+
+
 - name: Install faasd
   hosts: edge
   roles:
