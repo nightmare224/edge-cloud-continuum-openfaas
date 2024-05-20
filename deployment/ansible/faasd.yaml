@@ -1,5 +1,5 @@
 ---
-- name: Fetch p2p public key to all faasd node
+- name: Setup p2p key pair to all faasd node
   hosts: edge
   tasks:
     - name: Transfer execution file for generate keypair
@@ -19,6 +19,41 @@
         src: "{{ playbook_dir }}/roles/faasd/files/pubKey/"
         dest: /opt/p2p/pubKey-peer/
   become: yes
+
+- name: Setup faasd client config for all faasd node
+  hosts: edge
+  tasks:
+    - name: Generate the basic-auth-user
+      lineinfile:
+        path: /var/lib/faasd/secrets/basic-auth-user
+        line: "{{ faasclient_user }}"
+        create: true
+    - name: Generate the basic-auth-password
+      lineinfile:
+        path: /var/lib/faasd/secrets/basic-auth-password
+        line: "{{ faasclient_password }}"
+        regexp: '.*'
+        create: true
+    - name: Generate faasd client config
+      template: 
+        src: "{{ playbook_dir }}/roles/faasd/templates/faasclient.json"
+        # dest: "{{ playbook_dir }}/roles/faasd/files/faasclient/{{ ansible_host }}"
+        dest: /tmp/faasclient-{{ ansible_host }}
+        mode: 0644
+    - name: Fetch faasd client config
+      fetch:
+        src: /tmp/faasclient-{{ ansible_host }}
+        dest: "{{ playbook_dir }}/roles/faasd/files/faasclient/{{ ansible_host }}"
+        flat: true
+    - name: Scatter faasd client config to all faasd node
+      copy:
+        src: "{{ playbook_dir }}/roles/faasd/files/faasclient/"
+        dest: /opt/faasd/secrets/faasclient/
+  vars:
+    faasclient_password: "{{ lookup('ansible.builtin.password', '{{ playbook_dir }}/roles/faasd/files/basic-auth-password/{{ ansible_host }}', chars=['ascii_letters']) }}"
+    faasclient_user: admin
+  become: yes
+
 
 - name: Install faasd
   hosts: edge
