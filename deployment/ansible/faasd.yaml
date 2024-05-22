@@ -2,6 +2,11 @@
 - name: Setup p2p key pair to all faasd node
   hosts: edge
   tasks:
+    # - name: Clean up directory
+    #   file:
+    #     path: "{{ playbook_dir }}/roles/faasd/files/pubKey/"
+    #     state: absent
+    #   delegate_to: localhost
     - name: Transfer execution file for generate keypair
       copy:
         src: "{{ playbook_dir }}/roles/faasd/files/generate-p2p-keypair-arm64"
@@ -23,6 +28,14 @@
 - name: Setup faasd client config for all faasd node
   hosts: edge
   tasks:
+    # - name: Clean up directory
+    #   file:
+    #     path: "{{ playbook_dir }}/roles/faasd/files/{{ item }}/"
+    #     state: absent
+    #   with_items:
+    #     - faasclient
+    #     - password
+      # delegate_to: localhost
     - name: Generate the basic-auth-user
       lineinfile:
         path: /var/lib/faasd/secrets/basic-auth-user
@@ -61,3 +74,6 @@
     - role: common 
     - role: faasd
       become: yes
+  # environment:
+  #   FAAS_P2P_IP: "{{ ansible_host }}"
+  #   FAAS_P2P_PORT: "8282"
