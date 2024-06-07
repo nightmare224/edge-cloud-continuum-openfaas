@@ -3,11 +3,11 @@ provider:
   name: openfaas
   gateway: http://127.0.0.1:8080
 functions:
-  matrix-multiplication-high:
-    # lang: python3-debian
-    lang: dockerfile
-    handler: ./matrix-multiplication-high
-    image: nightmare224/matrix-multiplication-high:latest
+  matrix-multiplication:
+    lang: python3-debian
+    # lang: dockerfile
+    handler: ./matrix-multiplication
+    image: nightmare224/matrix-multiplication:latest
     environment:
       read_timeout: 0
       write_timeout: 0
@@ -15,8 +15,9 @@ functions:
     labels:
       com.openfaas.scale.min: 1
   iperf3:
-    # lang: python3-debian
-    lang: dockerfile
+    lang: python3-debian
+    # lang: dockerfile
+    handler: ./iperf3
     image: nightmare224/iperf3:latest
     environment:
         read_timeout: 0

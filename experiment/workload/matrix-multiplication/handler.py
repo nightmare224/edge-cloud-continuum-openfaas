@@ -3,7 +3,7 @@ import time as t
 
 np.random.seed(1)
 
-def handle(req):
+def handle(event, context):
     
     mainStartTime = t.time()
 
