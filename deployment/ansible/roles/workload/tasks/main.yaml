@@ -1,0 +1,15 @@
+- block:
+  - name: Load password
+    slurp:
+      src: "{{ role_path }}/../faasd/files/basic-auth-password/{{ ansible_host }}"
+    register: slurped_password
+    delegate_to: localhost
+  - name: Login faas-cli
+    shell: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
+    delegate_to: localhost
+
+
+
+- name: Deploy openfaas application
+  command: faas-cli -g http://{{ ansible_host }}:{{ faasgateway_port }} deploy -f {{ role_path }}/files/workload/stack.yaml # --filter {{ appName }}
+  delegate_to: localhost
