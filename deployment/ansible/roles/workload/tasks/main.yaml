@@ -8,7 +8,10 @@
     command: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
     delegate_to: localhost
 
+# - name: Publish openfaas function
+#   command: faas-cli publish -f {{ role_path }}/files/workload/stack.yaml --platforms linux/arm64,linux/amd64 # --filter {{ appName }}
+#   delegate_to: localhost
 
-- name: Deploy openfaas application
+- name: Deploy openfaas function
   command: faas-cli deploy --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f {{ role_path }}/files/workload/stack.yaml # --filter {{ appName }}
   delegate_to: localhost

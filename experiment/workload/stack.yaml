@@ -14,14 +14,44 @@ functions:
       exec_timeout: 0
     labels:
       com.openfaas.scale.min: 1
-  iperf3:
+  floating-point-operation-sine:
     lang: python3-debian
-    # lang: dockerfile
-    handler: ./iperf3
-    image: nightmare224/iperf3:latest
+    handler: ./floating-point-operation-sine
+    image: nightmare224/floating-point-operation-sine:latest
+    environment:
+      read_timeout: 0
+      write_timeout: 0
+      exec_timeout: 0
+    labels:
+      com.openfaas.scale.min: 1
+  sorter:
+    lang: dockerfile
+    handler: ./sorter
+    image: nightmare224/sorter:latest
     environment:
         read_timeout: 0
         write_timeout: 0
         exec_timeout: 0
     labels:
       com.openfaas.scale.min: 1
+  dd-cmd: 
+    lang: python3-debian
+    handler: ./dd-cmd
+    image: nightmare224/dd-cmd:latest
+    environment:
+      read_timeout: 0
+      write_timeout: 0
+      exec_timeout: 0
+    labels:
+      com.openfaas.scale.min: 1
+  # iperf3:
+  #   lang: python3-debian
+  #   # lang: dockerfile
+  #   handler: ./iperf3
+  #   image: nightmare224/iperf3:latest
+  #   environment:
+  #       read_timeout: 0
+  #       write_timeout: 0
+  #       exec_timeout: 0
+  #   labels:
+  #     com.openfaas.scale.min: 1

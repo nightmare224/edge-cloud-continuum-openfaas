@@ -1,0 +1,13 @@
+{
+    "case1": {
+        "user_count": 10,
+        "spawn_rate": 1,
+        "runtime_second": 10,
+        "user_type": "EdgeUser",
+        "user_host":[
+            "http://10.211.55.24:8080",
+            "http://10.211.55.28:8080"
+        ],
+        "result_file_basename": "result1"
+    }
+}
