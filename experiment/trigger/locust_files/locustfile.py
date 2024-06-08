@@ -13,15 +13,18 @@ class MicroBenchmark(TaskSet):
     def matrix_multiplication(self):
         self.client.get("/function/matrix-multiplication")
 
-    @task('cpu')
+    @tag('cpu')
+    @task
     def floating_point_operation_sine(self):
         self.client.get("/function/floating-point-operation-sine")
 
-    @task('memory')
+    @tag('memory')
+    @task
     def sorter(self):
         self.client.get("/function/sorter")
 
-    @task('io')
+    @tag('io')
+    @task
     def dd_cmd(self):
         self.client.get("/function/dd-cmd")
 
