@@ -1,15 +1,14 @@
 import gevent
 import json
-import argparse
-import pprint
+
 from locust.env import Environment
-from locust.stats import stats_printer, stats_history, StatsCSVFileWriter
-import locustfile
+from locust.stats import stats_printer, stats_history, StatsCSVFileWriter, print_stats_json
+from .locustfile import *
 
 def user_factory(name, base_class, attrs):
     return type(name, (base_class, ), attrs)
 
-def load_case_config(config_filename, casename, ):
+def load_case_config(config_filename, casename):
     with open(config_filename, 'r') as f:
         data = json.load(f)
     if casename not in data:
@@ -17,10 +16,11 @@ def load_case_config(config_filename, casename, ):
     
     return data[casename]
 
-def run(config):
+def run(config_filename, casename):
+    config = load_case_config(config_filename, casename)
     users = []
     for i, host in enumerate(config["user_host"]):
-        user = user_factory(f"user{i}", eval(f"locustfile.{config['user_type']}"), {"host": host})
+        user = user_factory(f"user{i}", eval(f"{config['user_type']}"), {"host": host})
         users.append(user)
 
     # setup Environment and Runner
@@ -38,7 +38,7 @@ def run(config):
     gevent.spawn(csv_writer.stats_writer)
 
     # start the test
-    runner.start(user_count = int(config["user_count"])/len(users), spawn_rate=1)
+    runner.start(user_count = int(config["user_count"]), spawn_rate=1)
 
     # in 10 seconds stop the runner
     gevent.spawn_later(int(config["runtime_second"]), runner.quit)
@@ -46,17 +46,5 @@ def run(config):
     # wait for the greenlets
     env.runner.greenlet.join()
 
-if __name__ == "__main__":
-    parser=argparse.ArgumentParser()
-    parser.add_argument("-c", "--configfile", type=str, default="./config.json", help = "Path to the config file (default ./config.json)")
-    parser.add_argument("-n", "--casename", type=str, required = True, help = "The target test case name in the config file")
-    args = parser.parse_args()
-
-    config = load_case_config(args.configfile, args.casename)
-    print(f"Test case '{args.casename}' config:\n")
-    pprint.pp(config)
-    print("\nRunning....")
-    run(config)
-    print("\nDone")
 
 

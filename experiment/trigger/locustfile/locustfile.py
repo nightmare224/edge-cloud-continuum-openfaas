@@ -1,7 +1,6 @@
 from locust import HttpUser, TaskSet, task, tag
 
-
-
+# Task
 class ExampleBenchmark(TaskSet):
     @task
     def env(self):
@@ -33,6 +32,8 @@ class AplicationLevelBenchmark(TaskSet):
     def hello_world(self):
         self.client.get("/function/env")
 
+
+# User
 class ExampleUser(HttpUser):
     tasks = [ExampleBenchmark]
 
