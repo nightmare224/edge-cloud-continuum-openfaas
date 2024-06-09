@@ -1,7 +1,7 @@
 import json
 from prometheus_api_client import PrometheusConnect
 from prometheus_api_client.utils import parse_datetime
-
+import numpy as np
 
 def create_prom_client_dict(config_filename):
     data = load_case_config(config_filename)
@@ -35,6 +35,16 @@ def cpu_avg_utilization(prom, start_time, end_time):
     return cpu_used_time/cpu_total_time * 100
 
 def memory_avg_utilization(prom, start_time, end_time):
-    pass
+    start_time = parse_datetime(start_time)
+    end_time = parse_datetime(end_time)
+    query = "1 - (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes) / node_memory_MemTotal_bytes"
+    metric_data = prom.custom_query_range(
+        query = query,
+        start_time=start_time,
+        end_time=end_time,
+        step = '1s'
+    )
+    val = metric_data[0]['values']
+    arr = np.array(val)[:,1].astype('float')
 
-# print(cpu_avg_utilization(prom, start_time, end_time))
+    return np.average(arr) * 100
