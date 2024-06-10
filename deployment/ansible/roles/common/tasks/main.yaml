@@ -10,3 +10,29 @@
     path: /home/{{ ansible_user }}/app
     state: directory
     mode: '0755'
+
+
+- name: Setup p2p key pair to all faasd node
+  block:
+    - name: Transfer execution file for generate keypair
+      copy:
+        src: "{{ role_path }}/files/generate-p2p-keypair-arm64"
+        dest: /opt/
+        mode: '0755'
+    - name: Generate keypair
+      command: /opt/generate-p2p-keypair-arm64
+    - name: Fetch public key
+      fetch:
+        src: /opt/p2p/pubKey
+        dest: "{{ role_path }}/files/p2p/pubKey/{{ ansible_host }}"
+        flat: true
+    - name: Fetch private key
+      fetch:
+        src: /opt/p2p/privKey
+        dest: "{{ role_path }}/files/p2p/privKey/{{ ansible_host }}"
+        flat: true
+    # - name: Scatter p2p public key to all faasd node
+    #   copy:
+    #     src: "{{ role_path }}/files/pubKey/"
+    #     dest: /opt/p2p/pubKey-peer/
+  become: yes

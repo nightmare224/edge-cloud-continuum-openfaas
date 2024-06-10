@@ -423,3 +423,8 @@ offload:  # the secret name is coneconfig
   hostalias:
   - ip: 10.211.55.24
     hostname: gateway.openfaas.cloud
+
+
+p2p:
+  enabled: true
+  ip: 0.0.0.0

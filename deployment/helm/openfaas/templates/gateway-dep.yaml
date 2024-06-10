@@ -41,6 +41,14 @@ spec:
         secret:
           secretName: kubeconfig
       {{- end}}
+      {{- if .Values.p2p.enabled }}
+      - name: p2p-pubkey
+        secret:
+          secretName: p2p-pubkey
+      - name: p2p-privkey
+        secret:
+          secretName: p2p-privkey
+      {{- end}}
       {{- if .Values.iam.enabled }}
       - name: issuer-key
         secret:
@@ -461,6 +469,15 @@ spec:
           readOnly: true
           mountPath: "/var/secrets/kubeconfig"
         {{- end }}
+        {{- if .Values.p2p.enabled }}
+        - name: p2p-pubkey
+          readOnly: true
+          mountPath: "/opt/p2p/pubKey-peer"
+        - name: p2p-privkey
+          readOnly: true
+          mountPath: "/opt/p2p/privKey"
+          subPath: privKey
+        {{- end }}
         {{- if .Values.iam.enabled }}
         - name: issuer-key
           readOnly: true
@@ -482,6 +499,9 @@ spec:
         - name: provider
           containerPort: 8081
           protocol: TCP
+        - name: p2p
+          containerPort: 30828
+          protocol: UDP
       {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:

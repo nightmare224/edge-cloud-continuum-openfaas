@@ -1,0 +1,25 @@
+{{- if .Values.offload.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-provider-p2p
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+  labels:
+    app: {{ template "openfaas.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: gateway
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  type: NodePort
+  ports:
+    - name: provider
+      port: 30828
+      targetPort: 30828
+      nodePort: 30828
+      protocol: UDP
+  selector:
+    app: gateway
+
+{{- end }}

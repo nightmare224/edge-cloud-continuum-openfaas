@@ -1,4 +1,10 @@
 ---
+- name: Common setup
+  hosts: on_premise:&master
+  roles:
+    - common
+  tags: openfaas_helm_update
+
 - name: Fetch the kubeconfig file from all Kubernetes server
   hosts: on_premise:&master
   tasks:
@@ -6,40 +12,62 @@
       fetch:
         src: "{{ kubeconfig_path }}"
         # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
-        dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
         flat: true
       # when: 
       #   "('on_premise' in group_names) and ('master' in group_names)"
 
 # need login before hand
-- name: Fetch the kubeconfig file from all Kubernetes server
-  hosts: aks
-  vars:
-    ansible_python_interpreter: /opt/homebrew/Caskroom/miniforge/base/envs/faas-workload/bin/python3
-  tasks:
-    - block:
-      - name: From AKS
-        azure_rm_aks_info:
-          # ad_user: "{{ aks_ad_user }}"
-          # password: "{{ aks_password }}"
-          subscription_id: "{{ aks_subscription_id }}"
-          name: "{{ aks_name }}"
-          resource_group: "{{ aks_resource_group }}"
-          show_kubeconfig: admin
-        register: resp_kubeconfig
-      - name: Save kubeconfig
-        copy:
-          content: "{{ resp_kubeconfig['aks'][0]['kube_config'] }}"
-          # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
-          dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
-      # when: "'aks' in group_names"
-      
+# - name: Fetch the kubeconfig file from all Kubernetes server
+#   hosts: aks
+#   vars:
+#     ansible_python_interpreter: /opt/homebrew/Caskroom/miniforge/base/envs/faas-workload/bin/python3
+#   tasks:
+#     - block:
+#       - name: From AKS
+#         azure_rm_aks_info:
+#           # ad_user: "{{ aks_ad_user }}"
+#           # password: "{{ aks_password }}"
+#           subscription_id: "{{ aks_subscription_id }}"
+#           name: "{{ aks_name }}"
+#           resource_group: "{{ aks_resource_group }}"
+#           show_kubeconfig: admin
+#         register: resp_kubeconfig
+#       - name: Save kubeconfig
+#         copy:
+#           content: "{{ resp_kubeconfig['aks'][0]['kube_config'] }}"
+#           # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
+#           dest: "{{ playbook_dir }}/roles/openfaas/files/{{ inventory_hostname }}-kubeconfig"
+#       # when: "'aks' in group_names"
+    
+
+
+- name: Copy required configs to the Helm chart
+  hosts: on_premise:&master 
+  tasks: 
+    # - name: Copy cluster's kubeconfig file
+    #   copy:
+    #     src: "{ playbook_dir }}/roles/openfaas/files/{{ item }}"
+    #     dest: "{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/"
+    #   with_fileglob:
+    #     - "*-kubeconfig"
+    #   delegate_to: localhost
+    - name: Copy p2p public key
+      copy:
+        src: "{{ playbook_dir }}/roles/common/files/p2p/pubKey/"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/pubKey-peer/"
+      delegate_to: localhost
+    - name: Copy p2p private key
+      copy:
+        src: "{{ playbook_dir }}/roles/common/files/p2p/privKey/"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/privKey/"
+      delegate_to: localhost
 
 - name: Install OpenFaaS on Kubernetes
   hosts:
     - on_premise:&master
-    - aks
+    # - aks
   gather_facts: no
   roles:
-    # - common
     - openfaas
+  # tags: openfaas_helm_update
