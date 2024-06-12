@@ -14,7 +14,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - name: provider
+    - name: p2p
       port: 30828
       targetPort: 30828
       nodePort: 30828
