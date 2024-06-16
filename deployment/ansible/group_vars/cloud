@@ -1,4 +1,7 @@
 ---
-openfaas_gateway_image: ghcr.io/openfaas/gateway:0.27.6
-openfaas_netes_image: ghcr.io/openfaas/faas-netes:0.18.3
-offload_enabled: false
+# openfaas_gateway_image: ghcr.io/openfaas/gateway:0.27.6
+# openfaas_netes_image: ghcr.io/openfaas/faas-netes:0.18.3
+# offload_enabled: false
+openfaas_gateway_image: nightmare224/faas-gateway-offload:0.0.17
+openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.87
+offload_enabled: true

@@ -1,4 +1,5 @@
 ---
+# only master
 - name: Ensure the infra directory exists
   file:
     path: /home/{{ ansible_user }}/infra
@@ -11,8 +12,8 @@
     state: directory
     mode: '0755'
 
-
-- name: Setup p2p key pair to all faasd node
+# only master
+- name: Setup p2p key pair to all faas node
   block:
     - name: Transfer execution file for generate keypair
       copy:
@@ -36,3 +37,22 @@
     #     src: "{{ role_path }}/files/pubKey/"
     #     dest: /opt/p2p/pubKey-peer/
   become: yes
+
+# all node
+- name: Setup UDP buffer sizes for p2p
+  block:
+    - name: Set maximum receive buffer size
+      ansible.posix.sysctl:
+        name: net.core.rmem_max
+        value: 7500000
+        state: present
+
+    - name: Set maximum send buffer size
+      ansible.posix.sysctl:
+        name: net.core.wmem_max
+        value: 7500000
+        state: present
+  rescue:
+    - name: Print error message if setting UDP buffer sizes fails
+      debug:
+        msg: "Failed to set UDP buffer sizes"

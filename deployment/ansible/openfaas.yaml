@@ -1,12 +1,11 @@
 ---
 - name: Common setup
-  hosts: on_premise:&master
+  hosts: master #on_premise:&master
   roles:
     - common
-  tags: openfaas_helm_update
 
 - name: Fetch the kubeconfig file from all Kubernetes server
-  hosts: on_premise:&master
+  hosts: master #on_premise:&master
   tasks:
     - name: From the on-premsie cluster
       fetch:
@@ -43,7 +42,7 @@
 
 
 - name: Copy required configs to the Helm chart
-  hosts: on_premise:&master 
+  hosts: master #on_premise:&master 
   tasks: 
     # - name: Copy cluster's kubeconfig file
     #   copy:
@@ -64,10 +63,10 @@
       delegate_to: localhost
 
 - name: Install OpenFaaS on Kubernetes
-  hosts:
-    - on_premise:&master
+  hosts: master
+    # - on_premise:&master
     # - aks
   gather_facts: no
   roles:
     - openfaas
-  # tags: openfaas_helm_update
+  tags: openfaas_helm_update

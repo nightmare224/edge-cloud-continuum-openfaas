@@ -1,0 +1,7 @@
+{
+    "ip": "{{ ansible_host }}",
+    "port": "{{ faasclient_port }}",
+    "path": "/",
+    "user": "{{ faasclient_user }}",
+    "password": "{{ faasclient_password }}"
+}
