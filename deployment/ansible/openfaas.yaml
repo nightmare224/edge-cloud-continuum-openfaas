@@ -1,4 +1,11 @@
 ---
+- name: P2P Common setup
+  hosts: 
+    - cloud
+    - edge
+  roles:
+    - p2p_common
+
 - name: Common setup
   hosts: master #on_premise:&master
   roles:
@@ -44,22 +51,15 @@
 - name: Copy required configs to the Helm chart
   hosts: master #on_premise:&master 
   tasks: 
-    # - name: Copy cluster's kubeconfig file
-    #   copy:
-    #     src: "{ playbook_dir }}/roles/openfaas/files/{{ item }}"
-    #     dest: "{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/"
-    #   with_fileglob:
-    #     - "*-kubeconfig"
-    #   delegate_to: localhost
     - name: Copy p2p public key
       copy:
-        src: "{{ playbook_dir }}/roles/common/files/p2p/pubKey/"
-        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/pubKey-peer/"
+        src: "{{ playbook_dir }}/roles/p2p_common/files/p2p/pubKey/{{ ansible_host }}"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/pubKey-peer/{{ ansible_host }}"
       delegate_to: localhost
     - name: Copy p2p private key
       copy:
-        src: "{{ playbook_dir }}/roles/common/files/p2p/privKey/"
-        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/privKey/"
+        src: "{{ playbook_dir }}/roles/p2p_common/files/p2p/privKey/{{ ansible_host }}"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/privKey/{{ ansible_host }}"
       delegate_to: localhost
 
 - name: Install OpenFaaS on Kubernetes

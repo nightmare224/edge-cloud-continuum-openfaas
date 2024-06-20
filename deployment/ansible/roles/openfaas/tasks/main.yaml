@@ -12,6 +12,7 @@
         enabled: "{{ offload_enabled }}"
         hostalias: "{{ hostalias }}"
       p2p:
+        enabled: "{{ p2p_enabled }}"
         ip: "{{ ansible_host }}"
       ingress:
         hosts:

@@ -1,7 +1,8 @@
 ---
 openfaas_gateway_image: nightmare224/faas-gateway-offload:0.0.17
-openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.87
+openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.131
 offload_enabled: true
+p2p_enabled: true
 
 faasgateway_port: 8080
 faasclient_port: 8081

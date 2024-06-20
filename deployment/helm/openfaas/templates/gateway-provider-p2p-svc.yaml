@@ -18,7 +18,7 @@ spec:
       port: 30828
       targetPort: 30828
       nodePort: 30828
-      protocol: UDP
+      protocol: TCP
   selector:
     app: gateway
 

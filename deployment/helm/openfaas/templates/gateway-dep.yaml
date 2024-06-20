@@ -501,7 +501,7 @@ spec:
           protocol: TCP
         - name: p2p
           containerPort: 30828
-          protocol: UDP
+          protocol: TCP
       {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:

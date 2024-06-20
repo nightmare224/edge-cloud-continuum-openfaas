@@ -1,0 +1,43 @@
+---
+# only master
+- name: Setup p2p key pair to all faas node
+  block:
+    - name: Transfer execution file for generate keypair
+      copy:
+        src: "{{ role_path }}/files/generate-p2p-keypair-arm64"
+        dest: /opt/
+        mode: '0755'
+    - name: Generate keypair
+      command: /opt/generate-p2p-keypair-arm64
+    - name: Fetch public key
+      fetch:
+        src: /opt/p2p/pubKey
+        dest: "{{ role_path }}/files/p2p/pubKey/{{ ansible_host }}"
+        flat: true
+    - name: Fetch private key
+      fetch:
+        src: /opt/p2p/privKey
+        dest: "{{ role_path }}/files/p2p/privKey/{{ ansible_host }}"
+        flat: true
+  become: yes
+  when: "'master' in group_names"
+
+# all node
+- name: Setup UDP buffer sizes for p2p
+  block:
+    - name: Set maximum receive buffer size
+      ansible.posix.sysctl:
+        name: net.core.rmem_max
+        value: 7500000
+        state: present
+
+    - name: Set maximum send buffer size
+      ansible.posix.sysctl:
+        name: net.core.wmem_max
+        value: 7500000
+        state: present
+  become: yes
+  rescue:
+    - name: Print error message if setting UDP buffer sizes fails
+      debug:
+        msg: "Failed to set UDP buffer sizes"

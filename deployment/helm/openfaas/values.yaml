@@ -335,6 +335,8 @@ prometheus:
   annotations: {}
   nodeExporter:
     enabled: true
+  serviceType: NodePort
+  nodePort: 30900
 
 alertmanager:
   image: prom/alertmanager:v0.27.0
@@ -372,7 +374,7 @@ nats:
 
 # ingress configuration
 ingress:
-  enabled: true
+  enabled: false
   ## For k8s >= 1.18 you need to specify the pathType
   ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
   #pathType: ImplementationSpecific
