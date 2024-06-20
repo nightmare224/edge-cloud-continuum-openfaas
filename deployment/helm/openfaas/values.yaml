@@ -422,9 +422,9 @@ k8sVersionOverride: "" #  Allow kubeVersion to be overridden for the ingress cre
 
 offload:  # the secret name is coneconfig
   enabled: true
-  hostalias:
-  - ip: 10.211.55.24
-    hostname: gateway.openfaas.cloud
+  # hostalias:
+  # - ip: 10.211.55.24
+  #   hostname: gateway.openfaas.cloud
 
 
 p2p:

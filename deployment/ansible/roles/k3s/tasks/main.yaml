@@ -1,28 +1,38 @@
 ---
-- name: Download K3S
-  get_url:
-    url: https://github.com/k3s-io/k3s/releases/download/v1.29.2+k3s1/k3s-arm64
-    dest: /usr/local/bin/k3s
+- name: print ansible_architecture
+  debug:
+    msg: "{{ ansible_architecture }}"
+
+- name: Copy the install script
+  copy:
+    src: get.k3s.io.sh
+    dest: /tmp/get.k3s.io.sh
     mode: '0755'
-  become: true
+
 
 - name: Copy K3S master config file
   template:
-    src: config-master.yaml
-    dest: /home/{{ ansible_user }}/infra/config-master.yaml
-  when: "'k3s_master' in group_names"
+    src: config-server.yaml
+    dest: /home/{{ ansible_user }}/infra/config-server.yaml
+  become: yes
+  when: "'k3s_master' in group_names"    
 
-- name: Start K3S master
-  command: k3s server --config /home/{{ ansible_user }}/infra/config-server.yaml
-  become: true
-  when: "'k3s_master' in group_names"
+- name: Install K3s master
+  shell: INSTALL_K3S_EXEC="--config=/home/{{ ansible_user }}/infra/config-server.yaml" /tmp/get.k3s.io.sh
+  environment:
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+  args:
+    executable: sh
+  timeout: 60
+  become: yes
+  when: "'k3s_master' in group_names" 
 
 - name: Fetch the token of K3S master
   fetch:
     src: /var/lib/rancher/k3s/server/token
     dest: "{{ role_path }}/files/token_{{ group_names[0] }}"
     flat: true
-  become: true
+  become: yes
   when: "'k3s_master' in group_names"
 
 - name: Fetch the hostname of K3S master
@@ -33,19 +43,13 @@
   delegate_to: localhost
   when: "'k3s_master' in group_names"
 
-- name: Start K3S worker
-  command: k3s agent --token {{ k3s_token }} --server {{ k3s_master_url }}
-  vars:
-    k3s_token: "{{ lookup('file', 'token_' + group_names[0]) }}"
-    k3s_master_url: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:6443"
-  become: true
+- name: Install K3s worker
+  shell: /tmp/get.k3s.io.sh
+  environment:
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+    K3S_TOKEN: "{{ lookup('file', 'token_' + group_names[0]) }}"
+    K3S_URL: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:6443"
+  args:
+    executable: sh
+  become: yes
   when: "'k3s_worker' in group_names"
-
-
-# - name: print
-#   debug:
-#     msg: "{{ k3s_master_url }}"
-#   vars:
-#     k3s_token: "{{ lookup('file', 'token_' + group_names[0]) }}"
-#     k3s_master_url: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:6443"
-#   when: "'k3s_worker' in group_names"

@@ -2,9 +2,15 @@
 # Which version of OpenFaaS Helm Chart to deploy
 cni_version: v0.9.1
 containerd_version: v1.7.0
+k3s_version: v1.29.5+k3s1
 openfaas_helm_version: 14.2.31
-hostalias:
-- ip: 10.211.55.24
-  hostname: gateway.openfaas.cloud
-- ip: 172.171.39.226
-  hostname: cloud2.aks.dev
+openfaas_gateway_image: nightmare224/faas-gateway-offload:0.0.17
+openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.132
+
+# hostalias:
+# - ip: 10.211.55.24
+#   hostname: gateway.openfaas.cloud
+# - ip: 10.211.55.25
+#   hostname: gateway.openfaas.edge
+# - ip: 172.171.39.226
+#   hostname: cloud2.aks.dev

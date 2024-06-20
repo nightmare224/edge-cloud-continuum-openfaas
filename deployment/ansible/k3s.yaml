@@ -1,6 +1,6 @@
 ---
 - name: Install K3S
-  hosts: k3s
+  hosts: all
   roles:
     - common 
     - k3s
