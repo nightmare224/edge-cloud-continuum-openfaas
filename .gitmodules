@@ -1,0 +1,9 @@
+[submodule "faas-netes"]
+	path = faas-netes
+	url = https://github.com/nightmare224/faas-netes.git
+[submodule "faasd"]
+	path = faasd
+	url = https://github.com/nightmare224/faasd.git
+[submodule "faas-gateway"]
+	path = faas-gateway
+	url = https://github.com/nightmare224/faas-gateway
