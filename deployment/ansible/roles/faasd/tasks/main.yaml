@@ -24,10 +24,12 @@
     unarchive:
       src: cni-plugins-linux-arm64-{{ cni_version }}.tgz
       dest: /opt/cni/bin/
+      creates: /opt/cni/bin/
   - name: Install containerd
     unarchive:
       src: containerd-{{ containerd_version }}-linux-arm64.tar.gz
       dest: /usr/local/bin/
+      creates: /usr/local/bin/containerd
   - name: Config containerd
     copy:
       src: containerd-{{ containerd_version }}.service
@@ -48,6 +50,10 @@
       dest: faasd/
     - src: faasd/prometheus.yml
       dest: faasd/
+    - src: faasd/alert.rules.yml
+      dest: faasd/
+    - src: faasd/alertmanager.yml
+      dest: faasd/
     - src: faasd/resolv.conf
       dest: faasd/
     - src: faasd/hack/faasd.service
@@ -65,7 +71,7 @@
 - name: Start faasd
   command: faasd install
   args:
-      chdir: /home/{{ ansible_user }}/app/faasd
+    chdir: /home/{{ ansible_user }}/app/faasd
   tags: faasd_update
   
 # don't know why it will not work for the first time, require restart
