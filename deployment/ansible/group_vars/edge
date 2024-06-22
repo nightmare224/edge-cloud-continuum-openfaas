@@ -1,7 +1,5 @@
 ---
-
+# general
 offload_enabled: true
 p2p_enabled: true
 
-faasgateway_port: 8080
-faasclient_port: 8081

@@ -388,6 +388,7 @@ spec:
         {{- if or .Values.openfaasPro .Values.oem }}
           - "-license-file=/var/secrets/license/license"
         {{- end }}
+          - "-offload={{ .Values.offload.enabled }}"
         {{- if or .Values.offload.enabled }}
           - "-kubeconfigpath=/var/secrets/kubeconfig"
         {{- end }}

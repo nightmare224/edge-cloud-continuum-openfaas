@@ -1,8 +1,30 @@
 ---
+- name: Cleanup localhost
+  hosts: localhost
+  tasks:
+    - name: Cleanup kubeconfig directory
+      file:
+        path: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig"
+        state: absent
+    - name: Recreate kubeconfig directory
+      file:
+        path: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig"
+        state: directory
+    - name: Cleanup p2p directory
+      file:
+        path: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p"
+        state: absent
+    - name: Recreate p2p/pubKey-peer directory
+      file:
+        path: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/pubKey-peer"
+        state: directory
+    - name: Recreate p2p/privKey directory
+      file:
+        path: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/privKey"
+        state: directory
+
 - name: P2P Common setup
-  hosts: 
-    - cloud
-    - edge
+  hosts: all
   roles:
     - p2p_common
 
@@ -14,12 +36,13 @@
 - name: Fetch the kubeconfig file from all Kubernetes server
   hosts: master #on_premise:&master
   tasks:
-    - name: From the on-premsie cluster
+    - name: Fetch from the cluster
       fetch:
         src: "{{ kubeconfig_path }}"
         # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
         dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
         flat: true
+      become: yes
       # when: 
       #   "('on_premise' in group_names) and ('master' in group_names)"
 
@@ -50,7 +73,7 @@
 
 - name: Copy required configs to the Helm chart
   hosts: master #on_premise:&master 
-  tasks: 
+  tasks:
     - name: Copy p2p public key
       copy:
         src: "{{ playbook_dir }}/roles/p2p_common/files/p2p/pubKey/{{ ansible_host }}"

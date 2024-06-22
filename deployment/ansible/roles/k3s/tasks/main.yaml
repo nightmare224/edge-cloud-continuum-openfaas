@@ -1,7 +1,17 @@
 ---
-- name: print ansible_architecture
-  debug:
-    msg: "{{ ansible_architecture }}"
+- block:
+  - name: Check if the k3s server service is running
+    command: systemctl is-active --quiet k3s
+    register: k3s_master_status
+    when: "'k3s_master' in group_names" 
+    failed_when: false
+  - name: Check if the service is running
+    command: systemctl is-active --quiet k3s-agent  
+    register: k3s_worker_status
+    when: "'k3s_worker' in group_names" 
+    failed_when: false
+  ignore_errors: true
+  
 
 - name: Copy the install script
   copy:
@@ -9,13 +19,12 @@
     dest: /tmp/get.k3s.io.sh
     mode: '0755'
 
-
 - name: Copy K3S master config file
   template:
     src: config-server.yaml
     dest: /home/{{ ansible_user }}/infra/config-server.yaml
   become: yes
-  when: "'k3s_master' in group_names"    
+  when: "'k3s_master' in group_names and k3s_master_status.rc != 0"
 
 - name: Install K3s master
   shell: INSTALL_K3S_EXEC="--config=/home/{{ ansible_user }}/infra/config-server.yaml" /tmp/get.k3s.io.sh
@@ -25,22 +34,24 @@
     executable: sh
   timeout: 60
   become: yes
-  when: "'k3s_master' in group_names" 
+  when: "'k3s_master' in group_names and k3s_master_status.rc != 0" 
 
-- name: Fetch the token of K3S master
-  fetch:
-    src: /var/lib/rancher/k3s/server/token
-    dest: "{{ role_path }}/files/token_{{ group_names[0] }}"
-    flat: true
-  become: yes
-  when: "'k3s_master' in group_names"
-
-- name: Fetch the hostname of K3S master
-  ansible.builtin.lineinfile:
-    path: "{{ role_path }}/files/hostname_{{ group_names[0] }}"
-    line: "{{ ansible_host }}"
-    create: true
-  delegate_to: localhost
+- block:
+  - name: Fetch the token of K3S master
+    fetch:
+      src: /var/lib/rancher/k3s/server/token
+      dest: "{{ role_path }}/files/token_{{ group_names[0] }}"
+      flat: true
+    become: yes
+  - name: Fetch the hostname of K3S master
+    copy:
+      content: "{{ ansible_host }}"
+      dest: "{{ role_path }}/files/hostname_{{ group_names[0] }}"
+    # ansible.builtin.lineinfile:
+    #   path: "{{ role_path }}/files/hostname_{{ group_names[0] }}"
+    #   line: "{{ ansible_host }}"
+    #   create: true
+    delegate_to: localhost
   when: "'k3s_master' in group_names"
 
 - name: Install K3s worker
@@ -52,4 +63,4 @@
   args:
     executable: sh
   become: yes
-  when: "'k3s_worker' in group_names"
+  when: "'k3s_worker' in group_names and k3s_worker_status.rc != 0"

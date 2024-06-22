@@ -1,41 +1,64 @@
 ---
-- name: Setup p2p key pair to all faasd node
-  hosts: edge
+- name: Cleanup localhost
+  hosts: localhost
   tasks:
-    # - name: Clean up directory
-    #   file:
-    #     path: "{{ playbook_dir }}/roles/faasd/files/pubKey/"
-    #     state: absent
-    #   delegate_to: localhost
-    - name: Transfer execution file for generate keypair
+    - name: Cleanup faasclient directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/faasclient"
+        state: absent
+    - name: Cleanup basic-auth-password directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/basic-auth-password"
+        state: absent
+    - name: Cleanup p2p directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/p2p"
+        state: absent
+    - name: Recreate p2p/pubKey-peer directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/p2p/pubKey-peer"
+        state: directory
+    - name: Recreate p2p/privKey directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/p2p/privKey"
+        state: directory
+
+- name: P2P Common setup
+  hosts: all
+  roles:
+    - p2p_common
+
+- name: Common setup
+  hosts: master #on_premise:&master
+  roles:
+    - common
+
+- name: Copy required configs to the faasd directory
+  hosts: faasd:&master #on_premise:&master 
+  tasks:
+    - name: Copy p2p public key
       copy:
-        src: "{{ playbook_dir }}/roles/faasd/files/generate-p2p-keypair-arm64"
-        dest: /opt/
-        mode: '0755'
-    - name: Generate keypair
-      command: /opt/generate-p2p-keypair-arm64
-    - name: Fetch public key
-      fetch:
-        src: /opt/p2p/pubKey
-        dest: "{{ playbook_dir }}/roles/faasd/files/pubKey/{{ ansible_host }}"
-        flat: true
-    - name: Scatter p2p public key to all faasd node
+        src: "{{ playbook_dir }}/roles/p2p_common/files/p2p/pubKey/{{ ansible_host }}"
+        dest: "{{ playbook_dir }}/roles/faasd/files/p2p/pubKey-peer/{{ ansible_host }}"
+      delegate_to: localhost
+    - name: Copy p2p private key
       copy:
-        src: "{{ playbook_dir }}/roles/faasd/files/pubKey/"
+        src: "{{ playbook_dir }}/roles/p2p_common/files/p2p/privKey/{{ ansible_host }}"
+        dest: "{{ playbook_dir }}/roles/faasd/files/p2p/privKey/{{ ansible_host }}"
+      delegate_to: localhost    
+
+- name: Scatter p2p public key to all faasd node
+  hosts: faasd
+  tasks:
+    - copy:
+        src: "{{ playbook_dir }}/roles/faasd/files/p2p/pubKey-peer/"
         dest: /opt/p2p/pubKey-peer/
   become: yes
 
-- name: Setup faasd client config for all faasd node
-  hosts: edge
+
+- name: Create faasd client config for all nodes
+  hosts: master
   tasks:
-    # - name: Clean up directory
-    #   file:
-    #     path: "{{ playbook_dir }}/roles/faasd/files/{{ item }}/"
-    #     state: absent
-    #   with_items:
-    #     - faasclient
-    #     - password
-      # delegate_to: localhost
     - name: Generate the basic-auth-user
       lineinfile:
         path: /var/lib/faasd/secrets/basic-auth-user
@@ -58,22 +81,21 @@
         src: /tmp/faasclient-{{ ansible_host }}
         dest: "{{ playbook_dir }}/roles/faasd/files/faasclient/{{ ansible_host }}"
         flat: true
-    - name: Scatter faasd client config to all faasd node
-      copy:
-        src: "{{ playbook_dir }}/roles/faasd/files/faasclient/"
-        dest: /opt/faasd/secrets/faasclient/
   vars:
     faasclient_password: "{{ lookup('ansible.builtin.password', '{{ playbook_dir }}/roles/faasd/files/basic-auth-password/{{ ansible_host }}', chars=['ascii_letters']) }}"
     faasclient_user: admin
   become: yes
 
+- name: Scatter faasd client config to all faasd node
+  hosts: faasd
+  tasks:
+    - copy:
+        src: "{{ playbook_dir }}/roles/faasd/files/faasclient/"
+        dest: /opt/faasd/secrets/faasclient/
+  become: yes
 
 - name: Install faasd
-  hosts: edge
+  hosts: faasd
   roles:
-    - role: common 
     - role: faasd
       become: yes
-  # environment:
-  #   FAAS_P2P_IP: "{{ ansible_host }}"
-  #   FAAS_P2P_PORT: "8282"

@@ -1,6 +1,3 @@
 [submodule "openfaas-gateway"]
 	path = openfaas-gateway
 	url = https://github.com/nightmare224/faas-gateway.git
-[submodule "faasd"]
-	path = faasd
-	url = https://github.com/nightmare224/faasd

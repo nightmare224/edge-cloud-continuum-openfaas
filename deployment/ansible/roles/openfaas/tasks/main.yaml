@@ -10,17 +10,17 @@
         image: "{{ openfaas_netes_image }}"
       offload:
         enabled: "{{ offload_enabled }}"
-        hostalias: "{{ hostalias }}"
+        # hostalias: "{{ hostalias }}"
       p2p:
         enabled: "{{ p2p_enabled }}"
         ip: "{{ ansible_host }}"
-      ingress:
-        hosts:
-        - host: "{{ hostname }}"
-          serviceName: gateway
-          servicePort: 8080
-          path: /
-        ingressClassName: "{{ ingressClassName }}"
+      # ingress:
+      #   hosts:
+      #   - host: "{{ hostname }}"
+      #     serviceName: gateway
+      #     servicePort: 8080
+      #     path: /
+      #   ingressClassName: "{{ ingressClassName }}"
     release_namespace: openfaas
     create_namespace: true
     wait: True
