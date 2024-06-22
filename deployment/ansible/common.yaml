@@ -1,0 +1,29 @@
+---
+- name: Create symbolic link
+  hosts: localhost
+  tasks:
+    - name: Create faasd
+      ansible.builtin.file:
+        src: "{{ playbook_dir }}/../../faasd"
+        dest: "{{ playbook_dir }}/roles/faasd/files/faasd"
+        state: link
+    - name: Create openfaas helm chart
+      ansible.builtin.file:
+        src: "{{ playbook_dir }}/../helm/openfaas"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas"
+        state: link 
+
+- name: P2P Common setup
+  hosts: all
+  roles:
+    - p2p_common
+
+- name: Faas Common setup
+  hosts: master
+  roles:
+    - faas_common
+
+- name: Common setup
+  hosts: master #on_premise:&master
+  roles:
+    - common

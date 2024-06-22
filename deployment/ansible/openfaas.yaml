@@ -23,15 +23,6 @@
         path: "{{ playbook_dir }}/roles/openfaas/files/openfaas/p2p/privKey"
         state: directory
 
-- name: P2P Common setup
-  hosts: all
-  roles:
-    - p2p_common
-
-- name: Common setup
-  hosts: master #on_premise:&master
-  roles:
-    - common
 
 - name: Fetch the kubeconfig file from all Kubernetes server
   hosts: master #on_premise:&master
@@ -39,7 +30,6 @@
     - name: Fetch from the cluster
       fetch:
         src: "{{ kubeconfig_path }}"
-        # dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
         dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
         flat: true
       become: yes
@@ -92,4 +82,6 @@
   gather_facts: no
   roles:
     - openfaas
+  vars:
+    faasclient_password: "{{ lookup('file', '{{ playbook_dir }}/roles/faas_common/files/basic-auth-password/{{ ansible_host }}') }}"
   tags: openfaas_helm_update

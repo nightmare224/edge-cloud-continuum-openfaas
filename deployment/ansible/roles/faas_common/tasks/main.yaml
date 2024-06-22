@@ -1,0 +1,5 @@
+---
+- name: Generate the basic-auth-password
+  debug:
+    msg:  "Create password for {{ ansible_host }}: {{ lookup('ansible.builtin.password', '{{ role_path }}/files/basic-auth-password/{{ ansible_host }}', chars=['ascii_letters']) }}"
+  delegate_to: localhost

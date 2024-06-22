@@ -6,10 +6,22 @@
       file:
         path: "{{ playbook_dir }}/roles/faasd/files/faasclient"
         state: absent
+    - name: Cleanup faasclient directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/faasclient"
+        state: absent
+    - name: Recreate faasclient directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/faasclient"
+        state: directory
     - name: Cleanup basic-auth-password directory
       file:
         path: "{{ playbook_dir }}/roles/faasd/files/basic-auth-password"
         state: absent
+    - name: Recreate basic-auth-password directory
+      file:
+        path: "{{ playbook_dir }}/roles/faasd/files/basic-auth-password"
+        state: directory
     - name: Cleanup p2p directory
       file:
         path: "{{ playbook_dir }}/roles/faasd/files/p2p"
@@ -23,18 +35,8 @@
         path: "{{ playbook_dir }}/roles/faasd/files/p2p/privKey"
         state: directory
 
-- name: P2P Common setup
-  hosts: all
-  roles:
-    - p2p_common
-
-- name: Common setup
-  hosts: master #on_premise:&master
-  roles:
-    - common
-
 - name: Copy required configs to the faasd directory
-  hosts: faasd:&master #on_premise:&master 
+  hosts: master #on_premise:&master 
   tasks:
     - name: Copy p2p public key
       copy:
@@ -45,6 +47,11 @@
       copy:
         src: "{{ playbook_dir }}/roles/p2p_common/files/p2p/privKey/{{ ansible_host }}"
         dest: "{{ playbook_dir }}/roles/faasd/files/p2p/privKey/{{ ansible_host }}"
+      delegate_to: localhost   
+    - name: Copy basic authentication password
+      copy:
+        src: "{{ playbook_dir }}/roles/faas_common/files/basic-auth-password/{{ ansible_host }}"
+        dest: "{{ playbook_dir }}/roles/faasd/files/basic-auth-password/{{ ansible_host }}"
       delegate_to: localhost    
 
 - name: Scatter p2p public key to all faasd node
@@ -56,8 +63,8 @@
   become: yes
 
 
-- name: Create faasd client config for all nodes
-  hosts: master
+- name: Setup basic authentication for faasd
+  hosts: faasd
   tasks:
     - name: Generate the basic-auth-user
       lineinfile:
@@ -70,21 +77,22 @@
         line: "{{ faasclient_password }}"
         regexp: '.*'
         create: true
-    - name: Generate faasd client config
-      template: 
-        src: "{{ playbook_dir }}/roles/faasd/templates/faasclient.json"
-        # dest: "{{ playbook_dir }}/roles/faasd/files/faasclient/{{ ansible_host }}"
-        dest: /tmp/faasclient-{{ ansible_host }}
-        mode: 0644
-    - name: Fetch faasd client config
-      fetch:
-        src: /tmp/faasclient-{{ ansible_host }}
-        dest: "{{ playbook_dir }}/roles/faasd/files/faasclient/{{ ansible_host }}"
-        flat: true
   vars:
-    faasclient_password: "{{ lookup('ansible.builtin.password', '{{ playbook_dir }}/roles/faasd/files/basic-auth-password/{{ ansible_host }}', chars=['ascii_letters']) }}"
+    faasclient_password: "{{ lookup('file', '{{ playbook_dir }}/roles/faas_common/files/basic-auth-password/{{ ansible_host }}') }}"
     faasclient_user: admin
   become: yes
+
+- name: Create faasd client config for all nodes
+  hosts: master
+  tasks:
+    - template: 
+        src: "{{ playbook_dir }}/roles/faasd/templates/faasclient.json"
+        dest: "{{ playbook_dir }}/roles/faasd/files/faasclient/{{ ansible_host }}"
+        mode: 0644
+      delegate_to: localhost
+  vars:
+    faasclient_password: "{{ lookup('file', '{{ playbook_dir }}/roles/faas_common/files/basic-auth-password/{{ ansible_host }}') }}"
+    faasclient_user: admin
 
 - name: Scatter faasd client config to all faasd node
   hosts: faasd

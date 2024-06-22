@@ -104,6 +104,7 @@ gateway:
     failureThreshold: 3
     successThreshold: 1
 
+
 eventSubscription:
   endpoint: ""
   endpointSecret: ""
@@ -289,6 +290,9 @@ dashboard:
       cpu: "50m"
     limits:
       memory: "256Mi"
+
+basicAuth:
+  basicAuthPassword: 
 
 # OpenFaaS Enterprise (OpenFaaS IAM)
 # OIDC plugin for authentication on the OpenFaaS REST API

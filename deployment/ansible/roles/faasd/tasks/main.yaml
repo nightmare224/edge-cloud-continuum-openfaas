@@ -54,7 +54,6 @@
       dest: faasd/hack/
     - src: faasd/hack/faasd-provider.service
       dest: faasd/hack/
-  tags: faasd_update
 
 - name: Upload faasd binary execution file
   copy:
@@ -70,8 +69,8 @@
   tags: faasd_update
   
 # don't know why it will not work for the first time, require restart
-- name: Restart faasd provider
-  ansible.builtin.systemd_service:
-    state: restarted
-    daemon_reload: true
-    name: faasd-provider
+# - name: Restart faasd provider
+#   ansible.builtin.systemd_service:
+#     state: restarted
+#     daemon_reload: true
+#     name: faasd-provider
