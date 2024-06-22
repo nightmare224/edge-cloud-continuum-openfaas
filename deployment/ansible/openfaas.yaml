@@ -25,7 +25,7 @@
 
 
 - name: Fetch the kubeconfig file from all Kubernetes server
-  hosts: master #on_premise:&master
+  hosts: master:&openfaas #on_premise:&master
   tasks:
     - name: Fetch from the cluster
       fetch:
@@ -76,7 +76,7 @@
       delegate_to: localhost
 
 - name: Install OpenFaaS on Kubernetes
-  hosts: master
+  hosts: master:&openfaas
     # - on_premise:&master
     # - aks
   gather_facts: no
