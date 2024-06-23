@@ -2,13 +2,20 @@
 # only master
 - name: Setup p2p key pair to all faas node
   block:
-    - name: Transfer execution file for generate keypair
+    - name: Transfer execution file for generate keypair (arm64)
       copy:
         src: "{{ role_path }}/files/generate-p2p-keypair-arm64"
-        dest: /opt/
+        dest: /opt/generate-p2p-keypair
         mode: '0755'
+      when: "ansible_architecture == 'aarch64' or ansible_architecture == 'arm64'"
+    - name: Transfer execution file for generate keypair (x86_64)
+      copy:
+        src: "{{ role_path }}/files/generate-p2p-keypair-amd64"
+        dest: /opt/generate-p2p-keypair
+        mode: '0755'
+      when: "ansible_architecture == 'x86_64'"
     - name: Generate keypair
-      command: /opt/generate-p2p-keypair-arm64
+      command: /opt/generate-p2p-keypair
     - name: Fetch public key
       fetch:
         src: /opt/p2p/pubKey

@@ -1,5 +1,6 @@
 write-kubeconfig-mode: "0644"
 bind-address: "{{ ansible_host }}"
+https-listen-port: 10443
 advertise-address: "{{ ansible_host }}"
 cluster-cidr: "10.42.0.0/16"
 service-cidr: "10.43.0.0/16"

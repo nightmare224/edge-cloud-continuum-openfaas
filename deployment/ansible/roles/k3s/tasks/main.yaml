@@ -59,7 +59,7 @@
   environment:
     INSTALL_K3S_VERSION: "{{ k3s_version }}"
     K3S_TOKEN: "{{ lookup('file', 'token_' + group_names[0]) }}"
-    K3S_URL: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:6443"
+    K3S_URL: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:10443"
   args:
     executable: sh
   become: yes
