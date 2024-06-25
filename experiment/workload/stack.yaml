@@ -4,8 +4,8 @@ provider:
   gateway: http://127.0.0.1:8080
 functions:
   matrix-multiplication:
-    lang: python3-debian
-    # lang: dockerfile
+    # lang: python3-debian
+    lang: dockerfile
     handler: ./matrix-multiplication
     image: nightmare224/matrix-multiplication:latest
     environment:
@@ -15,7 +15,8 @@ functions:
     labels:
       com.openfaas.scale.min: 1
   floating-point-operation-sine:
-    lang: python3-debian
+    # lang: python3-debian
+    lang: dockerfile
     handler: ./floating-point-operation-sine
     image: nightmare224/floating-point-operation-sine:latest
     environment:
@@ -35,7 +36,8 @@ functions:
     labels:
       com.openfaas.scale.min: 1
   dd-cmd: 
-    lang: python3-debian
+    # lang: python3-debian
+    lang: dockerfile
     handler: ./dd-cmd
     image: nightmare224/dd-cmd:latest
     environment:

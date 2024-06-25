@@ -1,5 +1,14 @@
 ---
+- name: Create symbolic link
+  hosts: localhost
+  tasks:
+    - name: Create workload
+      ansible.builtin.file:
+        src: "{{ playbook_dir }}/../../experiment/workload"
+        dest: "{{ playbook_dir }}/roles/workload/files/workload"
+        state: link
+
 - name: Deploy openfaas workload
-  hosts: edge
+  hosts: cloud:&master
   roles:
     - role: workload

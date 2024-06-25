@@ -1,7 +1,7 @@
 - block:
   - name: Obtain OpenFaaS client password
     slurp:
-      src: "{{ role_path }}/../faasd/files/basic-auth-password/{{ ansible_host }}"
+      src: "{{ role_path }}/../faas_common/files/basic-auth-password/{{ ansible_host }}"
     register: slurped_password
     delegate_to: localhost
   - name: Login faas-cli
@@ -13,5 +13,5 @@
 #   delegate_to: localhost
 
 - name: Deploy openfaas function
-  command: faas-cli deploy --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f {{ role_path }}/files/workload/stack.yaml # --filter {{ appName }}
+  command: faas-cli deploy --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f {{ role_path }}/files/workload/stack.yaml
   delegate_to: localhost
