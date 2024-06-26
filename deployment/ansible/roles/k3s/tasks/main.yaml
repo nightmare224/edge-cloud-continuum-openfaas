@@ -5,13 +5,42 @@
     register: k3s_master_status
     when: "'k3s_master' in group_names" 
     failed_when: false
-  - name: Check if the service is running
+  - name: Check if the k3s agent service is running
     command: systemctl is-active --quiet k3s-agent  
     register: k3s_worker_status
     when: "'k3s_worker' in group_names" 
     failed_when: false
   ignore_errors: true
   
+# - name: Make sure a systemd-resolved is running
+#   ansible.builtin.systemd_service:
+#     state: started
+#     name: systemd-resolved
+#     enabled: true
+  
+- block:
+  - name: Check if the file exists
+    stat:
+      path: /boot/firmware/cmdline.txt
+    register: file_status
+  - name: Check if the file exists
+    stat:
+      path: /boot/firmware/cmdline.txt
+    register: file_status
+  - name: Add cgroup flags
+    lineinfile:
+      path: /boot/firmware/cmdline.txt
+      regexp: '^(.*)(?<!cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1)$'  # Match lines that do not end with the word
+      # line: '\1 cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1'  # Append the word at the end of the line
+      line: '\1 cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1'
+      backrefs: yes
+    register: cgroup_flag
+    when: file_status.stat.exists
+  - name: Reboot if change
+    ansible.builtin.reboot:
+      reboot_timeout: 600
+    when: cgroup_flag.changed and file_status
+  become: yes
 
 - name: Copy the install script
   copy:
@@ -40,13 +69,13 @@
   - name: Fetch the token of K3S master
     fetch:
       src: /var/lib/rancher/k3s/server/token
-      dest: "{{ role_path }}/files/token_{{ group_names[0] }}"
+      dest: "{{ role_path }}/files/token/{{ group_names[1] }}"
       flat: true
     become: yes
   - name: Fetch the hostname of K3S master
     copy:
       content: "{{ ansible_host }}"
-      dest: "{{ role_path }}/files/hostname_{{ group_names[0] }}"
+      dest: "{{ role_path }}/files/hostname/{{ group_names[1] }}"
     # ansible.builtin.lineinfile:
     #   path: "{{ role_path }}/files/hostname_{{ group_names[0] }}"
     #   line: "{{ ansible_host }}"
@@ -58,8 +87,8 @@
   shell: /tmp/get.k3s.io.sh
   environment:
     INSTALL_K3S_VERSION: "{{ k3s_version }}"
-    K3S_TOKEN: "{{ lookup('file', 'token_' + group_names[0]) }}"
-    K3S_URL: "https://{{ lookup('file', 'hostname_' + group_names[0]) }}:10443"
+    K3S_TOKEN: "{{ lookup('file', 'token/' + group_names[1]) }}"
+    K3S_URL: "https://{{ lookup('file', 'hostname/' + group_names[1]) }}:10443"
   args:
     executable: sh
   become: yes

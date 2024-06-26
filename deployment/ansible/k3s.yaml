@@ -1,4 +1,25 @@
 ---
+- name: Cleanup localhost
+  hosts: localhost
+  tasks:
+    - name: Cleanup k3s hostname directory 
+      file:
+        path: "{{ playbook_dir }}/roles/k3s/files/hostname"
+        state: absent
+    - name: Cleanup k3s token directory 
+      file:
+        path: "{{ playbook_dir }}/roles/k3s/files/token"
+        state: absent
+    - name: Recreate k3s hostname directory 
+      file:
+        path: "{{ playbook_dir }}/roles/k3s/files/hostname"
+        state: directory
+    - name: Recreate k3s token directory 
+      file:
+        path: "{{ playbook_dir }}/roles/k3s/files/token"
+        state: directory
+
+
 - name: Install K3S
   hosts: all
   roles:
