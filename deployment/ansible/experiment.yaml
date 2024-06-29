@@ -14,6 +14,10 @@
 - name: Emulate network toplology
   hosts: all
   tasks:
+    - name: Install require tool
+      apt:
+        name: jq
+      become: yes
     - name: Upload inventory file
       copy: 
         src: /tmp/inventory.json
@@ -43,8 +47,8 @@
     - name: Wait it delete
       sleep: 600
 
-# - name: Include workload playbook
-#   ansible.builtin.import_playbook: workload.yaml
+- name: Include workload playbook
+  ansible.builtin.import_playbook: workload.yaml
 
 # - name: Trigger experiment
 #   hosts: localhost

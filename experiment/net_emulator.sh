@@ -46,6 +46,20 @@ function apply_filter() {
     done
 }
 
+function check_qdisc() {
+    local interface=$1
+    msg=$(tc qdisc show dev ${interface})
+    if ! echo ${msg} | grep -q "qdisc netem 10: parent 1:1 limit 1000 delay ${DELAY_CLASS1}"; then
+        return 1
+    fi
+    if ! echo ${msg} | grep -q "qdisc netem 20: parent 1:2 limit 1000 delay ${DELAY_CLASS2}"; then
+        return 1
+    fi
+    if ! echo ${msg} | grep -q "qdisc netem 30: parent 1:3 limit 1000 delay ${DELAY_CLASS3}"; then
+        return 1
+    fi
+}
+
 function log() {
   timestamp=`date "+%Y-%m-%d %H:%M:%S"`
   echo "[${USER}][${timestamp}][${1}]: ${2}"
@@ -58,6 +72,11 @@ main() {
     interface=$(ip route show default | awk '{print $5}')
     # interface="enp0s5"
     log "INFO" "IP: ${self_ip}, Group: ${self_group}, Interface: ${interface}"
+
+    if check_qdisc ${interface}; then
+        log "INFO" "The emulator has already applied"
+        exit 0
+    fi
 
     tc qdisc add dev ${interface} root handle 1:0 prio 2>&1 
     ret_val=$?
