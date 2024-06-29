@@ -1,0 +1,55 @@
+---
+- name: Generate inventory file in json format
+  hosts: localhost
+  tasks:
+    - name: register json format
+      command: ansible-inventory -i {{ ansible_inventory_sources[0] }} --list
+      register: inventory_content
+    - name: output file
+      copy:
+        content: "{{ inventory_content.stdout }}"
+        dest: /tmp/inventory.json
+
+
+- name: Emulate network toplology
+  hosts: all
+  tasks:
+    - name: Upload inventory file
+      copy: 
+        src: /tmp/inventory.json
+        dest: /tmp/inventory.json
+    - name: Execute emulate script
+      script: 
+        cmd: "{{ playbook_dir }}/../../experiment/net_emulator.sh /tmp/inventory.json {{ ansible_host }} {{ group_names[1] }}"
+        chdir: /tmp/
+      become: yes
+
+- name: Pull down all image before testing
+  hosts: all
+  tasks:
+    - command: ctr image pull {{ item }}  
+      loop:
+        - docker.io/nightmare224/matrix-multiplication:latest
+        - docker.io/nightmare224/floating-point-operation-sine:latest
+        - docker.io/nightmare224/sorter:latest
+      become: yes
+
+- name: Remove openfaas function on edge
+  hosts: edge:&master
+  tasks:
+    - name: Remove openfaas function on edge
+      command: faas-cli remove --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f ./roles/workload/files/workload/stack.yaml
+      delegate_to: localhost
+    - name: Wait it delete
+      sleep: 600
+
+# - name: Include workload playbook
+#   ansible.builtin.import_playbook: workload.yaml
+
+# - name: Trigger experiment
+#   hosts: localhost
+#   tasks:
+#     - command: trigger.sh
+    
+#   vars:
+#     user_max: 10

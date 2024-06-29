@@ -8,6 +8,18 @@
         dest: "{{ playbook_dir }}/roles/workload/files/workload"
         state: link
 
+- name: Login openfaas
+  hosts: master
+  tasks:
+  - name: Obtain OpenFaaS client password
+    slurp:
+      src: "roles/faas_common/files/basic-auth-password/{{ ansible_host }}"
+    register: slurped_password
+    delegate_to: localhost
+  - name: Login faas-cli
+    command: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
+    delegate_to: localhost
+
 - name: Deploy openfaas workload
   hosts: cloud:&master
   roles:
