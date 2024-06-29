@@ -87,12 +87,19 @@ data:
             serverity: major
             receiver: scale
         - alert: IdleService
-          expr: sum by (function_name) (gateway_service_count) > 1 and ((sum by (function_name) (increase(gateway_functions_seconds_count{code="200"}[30s])) == 0) or ((sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) < 2))
+          expr: (sum by (function_name) (increase(gateway_functions_seconds_count{code="200"}[30s]) == 0)) + (sum by (function_name) (gateway_service_count) > 1)
           for: 20s
           labels:
             service: gateway
             serverity: major
             receiver: scale
+        # - alert: IdleService
+        #   expr: ((sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) < 2) + (sum by (function_name) (gateway_service_count) > 1)
+        #   for: 20s
+        #   labels:
+        #     service: gateway
+        #     serverity: major
+        #     receiver: scale
 
 {{- end }}
 {{- end }}

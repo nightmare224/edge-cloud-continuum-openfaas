@@ -21,18 +21,22 @@ def load_case_config(config_filename):
 def cpu_avg_utilization(prom, start_time, end_time):
     start_time = parse_datetime(start_time)
     end_time = parse_datetime(end_time)
-    query= "sum by () (node_cpu_seconds_total{mode!='idle'})"
+    # query= "sum by () (node_cpu_seconds_total{mode!='idle'})"
+    query= "sum by (instance) (node_cpu_seconds_total{mode!='idle'})"
     metric_data = prom.custom_query_range(
         query = query,
         start_time=start_time,
         end_time=end_time,
         step = '1s'
     )
-    val = metric_data[0]['values']
-    cpu_used_time = float(val[-1][1]) - float(val[0][1])
-    cpu_total_time = float(val[-1][0]) - float(val[0][0])
+    result = {}
+    for data in metric_data:
+        val = data['values']
+        cpu_used_time = float(val[-1][1]) - float(val[0][1])
+        cpu_total_time = float(val[-1][0]) - float(val[0][0])
+        result[data["metric"]["instance"]] = cpu_used_time/cpu_total_time * 100
 
-    return cpu_used_time/cpu_total_time * 100
+    return result
 
 def memory_avg_utilization(prom, start_time, end_time):
     start_time = parse_datetime(start_time)
@@ -44,7 +48,10 @@ def memory_avg_utilization(prom, start_time, end_time):
         end_time=end_time,
         step = '1s'
     )
-    val = metric_data[0]['values']
-    arr = np.array(val)[:,1].astype('float')
+    result = {}
+    for data in metric_data:
+        val = data['values']
+        arr = np.array(val)[:,1].astype('float')
+        result[data["metric"]["instance"]] = np.average(arr) * 100
 
-    return np.average(arr) * 100
+    return result
