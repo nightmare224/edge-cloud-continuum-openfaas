@@ -41,7 +41,8 @@ def cpu_avg_utilization(prom, start_time, end_time):
 def memory_avg_utilization(prom, start_time, end_time):
     start_time = parse_datetime(start_time)
     end_time = parse_datetime(end_time)
-    query = "1 - (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes) / node_memory_MemTotal_bytes"
+    # query = "1 - (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes) / node_memory_MemTotal_bytes"
+    query = "node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes)"
     metric_data = prom.custom_query_range(
         query = query,
         start_time=start_time,
@@ -52,6 +53,6 @@ def memory_avg_utilization(prom, start_time, end_time):
     for data in metric_data:
         val = data['values']
         arr = np.array(val)[:,1].astype('float')
-        result[data["metric"]["instance"]] = np.average(arr) * 100
+        result[data["metric"]["instance"]] = np.average(arr) / 1024 / 1024
 
     return result

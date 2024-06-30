@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import glob
+import pandas as pd
 from locustfile.runner import run
 from prometheus.metrics import cpu_avg_utilization, memory_avg_utilization, create_prom_client_dict
 from datetime import datetime
@@ -24,25 +25,22 @@ if __name__ == "__main__":
     end_time = datetime.now()
     print("\nDone")
 
-    ### gather resource metric from prometheus ###
+    # ### gather resource metric from prometheus ###
     prom_client_dict = create_prom_client_dict(args.config_prom)
-    metrics_dict = {'cpu':{}, 'memory':{}}
+    df_metrics = pd.DataFrame(columns = ["cpu", "memory"])
+    df_metrics.index.name = "hostname"
     for url in prom_client_dict:
         # cpu
         cpu = cpu_avg_utilization(prom_client_dict[url], start_time, end_time)
-        metrics_dict['cpu'].update(cpu)
+        for hostname in cpu:
+            df_metrics.loc[hostname.split(':')[0], "cpu"] = cpu[hostname]
+
         # memory
         memory = memory_avg_utilization(prom_client_dict[url], start_time, end_time)
-        metrics_dict['memory'].update(memory)
-    # Writing dictionary to JSON file
-    with open(f"{args.casename}_resource_metric.json", 'w') as json_file:
-        json.dump(metrics_dict, json_file)
+        for hostname in memory:
+            df_metrics.loc[hostname.split(':')[0], "memory"] = memory[hostname]
 
-    ### move result all to result directory ###
-    # Ensure the destination directory exists
-    if not os.path.exists(args.result_filepath):
-        os.makedirs(args.result_filepath)
-    # Use glob to find files matching the pattern
-    files_to_move = glob.glob(args.casename)
-    for file_path in files_to_move:
-        shutil.move(file_path, args.result_filepath)
+
+    df_metrics.reset_index(inplace = True)
+    print(df_metrics)
+    df_metrics.to_csv(f"{args.casename}_metrics.csv", index = False)

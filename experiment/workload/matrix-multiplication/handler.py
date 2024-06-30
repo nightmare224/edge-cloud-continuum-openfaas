@@ -8,9 +8,8 @@ def handle(req):
     mainStartTime = t.time()
 
     """This function will multiply two 2000 * 2000 matrices """
-    print("Initializing two square matrices of size 2000 by 2000.")
     m = 2000
-    n = 100
+    n = 1
 
     # Initialzing the two square matrices
     matrix_1 = np.random.rand(m, m)
@@ -27,8 +26,6 @@ def handle(req):
 
     mainEndTime = t.time()
 
-    print("Time taken to multiply matrices of 2000 by 2000 size:" + str(endTime-startTime) + " seconds")
-    print("Time taken to execute the entire function is:" + str(mainEndTime-mainStartTime) + " seconds")
+    elaspedFunTime = "Time taken to execute the entire function is:" + str(mainEndTime-mainStartTime) + " seconds"
 
-    return "Result is saved in the container."
-
+    return elaspedFunTime

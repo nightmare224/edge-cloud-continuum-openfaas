@@ -1,0 +1,56 @@
+{  
+    "case1": {
+        "user_count": 1,
+        "spawn_rate": 1,
+        "runtime_second": 120,
+        "user_type": "<USERTYPE>",
+        "user_host":[
+            "<HOSTURL>"
+        ]
+    },
+    "case2": {
+        "user_count": 2,
+        "spawn_rate": 2,
+        "runtime_second": 120,
+        "user_type": "<USERTYPE>",
+        "user_host":[
+            "<HOSTURL>"
+        ]
+    },
+    "case3": {
+        "user_count": 3,
+        "spawn_rate": 3,
+        "runtime_second": 120,
+        "user_type": "<USERTYPE>",
+        "user_host":[
+            "<HOSTURL>"
+        ]
+    },
+    "case4": {
+        "user_count": 4,
+        "spawn_rate": 4,
+        "runtime_second": 120,
+        "user_type": "<USERTYPE>",
+        "user_host":[
+            "<HOSTURL>"
+        ]
+    },
+    "case5": {
+        "user_count": 5,
+        "spawn_rate": 5,
+        "runtime_second": 120,
+        "user_type": "<USERTYPE>",
+        "user_host":[
+            "<HOSTURL>"
+        ]
+    },
+    "case6": {
+        "user_count": 6,
+        "spawn_rate": 6,
+        "runtime_second": 120,
+        "user_type": "<USERTYPE>",
+        "user_host":[
+            "<HOSTURL>"
+        ]
+    }
+}

@@ -1,10 +1,10 @@
 from locust import HttpUser, TaskSet, task, tag
 
-# Task
+### Task ###
 class ExampleBenchmark(TaskSet):
     @task
-    def env(self):
-        self.client.get("/function/env")
+    def nodeinfo(self):
+        self.client.get("/function/nodeinfo")
 
 class MicroBenchmark(TaskSet):
     @tag('memory', 'cpu')
@@ -22,21 +22,43 @@ class MicroBenchmark(TaskSet):
     def sorter(self):
         self.client.get("/function/sorter")
 
-    @tag('io')
-    @task
-    def dd_cmd(self):
-        self.client.get("/function/dd-cmd")
+# class AplicationLevelBenchmark(TaskSet):
+#     @task
+#     def hello_world(self):
+#         self.client.get("/function/env")
 
-class AplicationLevelBenchmark(TaskSet):
-    @task
-    def hello_world(self):
-        self.client.get("/function/env")
+### User ###
+class IdleUser(HttpUser):
+    tasks = []
 
 
-# User
-class ExampleUser(HttpUser):
-    tasks = [ExampleBenchmark]
+class CPUUser(HttpUser):
+    tasks = [MicroBenchmark.floating_point_operation_sine]
 
-class EdgeUser(HttpUser):
-    tasks = [MicroBenchmark]
 
+class MemoryUser(HttpUser):
+    tasks = [MicroBenchmark.floating_point_operation_sine]
+
+
+
+# class StepLoadShape(LoadTestShape):
+#     """
+#     A step load shape
+
+#     Keyword arguments:
+
+#         step_time -- Time between steps
+#         step_load -- User increase amount at each step
+#         spawn_rate -- Users to stop/start per second at every step
+#         time_limit -- Time limit in seconds
+#     """
+#     step_time = 10
+#     step_load = 0
+#     spawn_rate = 1
+#     time_limit = 60
+#     def tick(self):
+#         run_time = self.get_run_time()
+#         if run_time > self.time_limit:
+#             return None
+#         current_step = math.floor(run_time / self.step_time) + 1
+#         return (current_step * self.step_load, self.spawn_rate)

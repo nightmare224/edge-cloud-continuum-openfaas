@@ -23,6 +23,7 @@ def run(config_filename, casename):
         user = user_factory(f"user{i}", eval(f"{config['user_type']}"), {"host": host})
         users.append(user)
 
+
     # no user, no task, just idle and return    
     if len(users) == 0:
         config["runtime_second"]
