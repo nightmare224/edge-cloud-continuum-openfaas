@@ -36,7 +36,19 @@
         - docker.io/nightmare224/matrix-multiplication:latest
         - docker.io/nightmare224/floating-point-operation-sine:latest
         - docker.io/nightmare224/sorter:latest
-      become: yes
+  become: yes
+
+- name: Login openfaas
+  hosts: master
+  tasks:
+    - name: Obtain OpenFaaS client password
+      slurp:
+        src: "{{ playbook_dir }}/roles/faas_common/files/basic-auth-password/{{ ansible_host }}"
+      register: slurped_password
+      delegate_to: localhost
+    - name: Login faas-cli
+      command: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
+      delegate_to: localhost
 
 - name: Remove openfaas function on edge
   hosts: edge:&master
@@ -44,8 +56,6 @@
     - name: Remove openfaas function on edge
       command: faas-cli remove --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f ./roles/workload/files/workload/stack.yaml
       delegate_to: localhost
-    - name: Wait it delete
-      sleep: 600
 
 - name: Include workload playbook
   ansible.builtin.import_playbook: workload.yaml

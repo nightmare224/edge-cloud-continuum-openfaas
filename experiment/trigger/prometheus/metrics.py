@@ -34,8 +34,11 @@ def cpu_avg_utilization(prom, start_time, end_time):
         val = data['values']
         cpu_used_time = float(val[-1][1]) - float(val[0][1])
         cpu_total_time = float(val[-1][0]) - float(val[0][0])
-        result[data["metric"]["instance"]] = cpu_used_time/cpu_total_time * 100
-
+        instance_url = data["metric"]["instance"]
+        if "prometheus-node-exporter" in instance_url:
+            instance_url = prom.prometheus_host.split(':')[0]
+        result[instance_url] = cpu_used_time/cpu_total_time * 100
+    
     return result
 
 def memory_avg_utilization(prom, start_time, end_time):
@@ -53,6 +56,9 @@ def memory_avg_utilization(prom, start_time, end_time):
     for data in metric_data:
         val = data['values']
         arr = np.array(val)[:,1].astype('float')
-        result[data["metric"]["instance"]] = np.average(arr) / 1024 / 1024
+        instance_url = data["metric"]["instance"]
+        if "prometheus-node-exporter" in instance_url:
+            instance_url = prom.prometheus_host.split(':')[0]
+        result[instance_url] = np.average(arr) / 1024 / 1024
 
     return result

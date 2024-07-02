@@ -1,10 +1,12 @@
 #!/bin/bash
 
-USER_MAX=4
-CONFIG_LOCUST="config/locust/cpu.json"
+USER_START=1
+USER_END=1
 
-# user_cnt="1"
-# python3 main.py -l ${config_locust} -c case${user_cnt} -p config/config_prom.json
+# centralized, federated, decentralized
+ARCH="decentralized"
+CONFIG_LOCUST="config/locust/${ARCH}/cpu.json"
+CONFIG_PROM="config/prom/${ARCH}/config_prom.json"
 
 function log() {
     timestamp=`date "+%Y-%m-%d %H:%M:%S"`
@@ -14,10 +16,11 @@ function log() {
 main() {
 
 
-    for user_cnt in $(seq ${USER_MAX}); do
-        python3 main.py -l ${CONFIG_LOCUST} -c case${user_cnt}
-        mv *.csv result/
-        sleep 30
+    for user_cnt in $(seq ${USER_START} ${USER_END}); do
+        python3 main.py -l ${CONFIG_LOCUST} -p ${CONFIG_PROM} -c case${user_cnt}
+        mk -p result/${ARCH} 2> /dev/null
+        mv *.csv result/${ARCH}
+        # sleep 30
     done
 
 }
