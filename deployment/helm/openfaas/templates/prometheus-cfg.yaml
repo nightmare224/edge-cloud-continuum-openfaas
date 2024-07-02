@@ -80,7 +80,7 @@ data:
       - name: openfaas
         rules:
         - alert: SlowRequest
-          expr: (sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) > 8
+          expr: (sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) > 1.5
           for: 20s
           labels:
             service: gateway

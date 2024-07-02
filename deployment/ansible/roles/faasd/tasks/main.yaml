@@ -24,7 +24,7 @@
     unarchive:
       src: cni-plugins-linux-arm64-{{ cni_version }}.tgz
       dest: /opt/cni/bin/
-      creates: /opt/cni/bin/
+      creates: /opt/cni/bin/bridge
   - name: Install containerd
     unarchive:
       src: containerd-{{ containerd_version }}-linux-arm64.tar.gz

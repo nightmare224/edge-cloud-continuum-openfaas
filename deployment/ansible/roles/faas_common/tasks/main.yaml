@@ -3,3 +3,14 @@
   debug:
     msg:  "Create password for {{ ansible_host }}: {{ lookup('ansible.builtin.password', '{{ role_path }}/files/basic-auth-password/{{ ansible_host }}', chars=['ascii_letters']) }}"
   delegate_to: localhost
+
+- name: Login openfaas
+  block:
+  - name: Obtain OpenFaaS client password
+    slurp:
+      src: "{{ role_path }}/files/basic-auth-password/{{ ansible_host }}"
+    register: slurped_password
+    delegate_to: localhost
+  - name: Login faas-cli
+    command: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
+    delegate_to: localhost
