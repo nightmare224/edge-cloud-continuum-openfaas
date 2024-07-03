@@ -1,8 +1,4 @@
 
-# sudo chmod 755 /etc/wireguard/add-nat.sh
-# sudo chmod 755 /etc/wireguard/del-nat.sh
-
-
 - name: Install wireguard
   apt:
     name: wireguard
@@ -28,15 +24,31 @@
     delegate_to: localhost
   - name: Fetch private and public key
     fetch:
-        src: /home/{{ ansible_user }}/infra/{{ item }}
-        dest: "{{ role_path }}/files/{{ wireguard_ip }}/{{ item }}"
-        flat: true
+      src: /home/{{ ansible_user }}/infra/{{ item }}
+      dest: "{{ role_path }}/files/{{ wireguard_ip }}/{{ item }}"
+      flat: true
     loop:
       - publicKey
       - privateKey
 
+- name: Obtain wireguard public endpoint
+  copy:
+    content: "{{ ansible_host }}"
+    dest: "{{ role_path }}/files/{{ wireguard_ip }}/endpoint"
+  delegate_to: localhost
+  when: "'k3s_master' in group_names"
+
 - name: Create wg0.conf for master node
   block:
+  - name: transfer add-nat.sh and del-nat.sh
+    copy:
+      src: "{{ role_path }}/files/{{ item }}"
+      dest: /etc/wireguard/{{ item }}
+      mode: '0755'
+    loop:
+      - add-nat.sh
+      - del-nat.sh
+    become: yes
   - name: Find ip directory
     find:
       paths: "{{ role_path }}/files"
@@ -44,7 +56,7 @@
       excludes: '10.202.0.1'
     register: ip_dirpath
     delegate_to: localhost
-  - name: test
+  - name: generate peer id list
     shell: |
       output=""
       for i in $(ls {{ role_path }}/files/ | grep 10); do
@@ -76,6 +88,11 @@
     privateKey: "{{ lookup('file', '{{ role_path }}/files/{{ wireguard_ip }}/privateKey') }}"
     peer:
       publicKey: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/publicKey') }}"
-      endpoint:
+      endpoint: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/endpoint') }}"
   become: yes
   when: "'k3s_worker' in group_names"
+
+
+- name: start wireguard
+  command: wg-quick up wg0
+  become: yes
