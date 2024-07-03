@@ -1,10 +1,16 @@
 - name: Include common playbook for general setup
   ansible.builtin.import_playbook: common.yaml
 
-- name: Wireguard
+- name: Setup Wireguard
   hosts: all
-  roles:
-    - wireguard
+  tasks:
+    - name: Check if wiregurad is set
+      command: ip a show dev wg0
+      register: wg_install
+    - name: Run wireguard role
+      include_role:
+        name: wireguard
+      when: "wg_install.rc != 0"
 
 # k3s playbook should also be execute
 - name: Include k3s playbook to deploy on cloud and edge side
