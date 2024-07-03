@@ -1,0 +1,81 @@
+
+# sudo chmod 755 /etc/wireguard/add-nat.sh
+# sudo chmod 755 /etc/wireguard/del-nat.sh
+
+
+- name: Install wireguard
+  apt:
+    name: wireguard
+  become: yes
+
+- name: Enable ip forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+  become: yes
+
+- name: Generate keypair
+  shell: wg genkey | tee privateKey | wg pubkey > publicKey
+  args:
+    chdir: /home/{{ ansible_user }}/infra/
+
+- name: Obtain wireguard private and public key
+  block:
+  - name: Create directory with wireguard ip
+    file:
+      path: "{{ role_path }}/files/{{ wireguard_ip }}"
+      state: directory
+    delegate_to: localhost
+  - name: Fetch private and public key
+    fetch:
+        src: /home/{{ ansible_user }}/infra/{{ item }}
+        dest: "{{ role_path }}/files/{{ wireguard_ip }}/{{ item }}"
+        flat: true
+    loop:
+      - publicKey
+      - privateKey
+
+- name: Create wg0.conf for master node
+  block:
+  - name: Find ip directory
+    find:
+      paths: "{{ role_path }}/files"
+      file_type: directory
+      excludes: '10.202.0.1'
+    register: ip_dirpath
+    delegate_to: localhost
+  - name: test
+    shell: |
+      output=""
+      for i in $(ls {{ role_path }}/files/ | grep 10); do
+        publicKey=$(cat {{ role_path }}/files/${i}/publicKey)
+        output="${output}, {\"ip\": \"${i}\", \"publicKey\": \"${publicKey}\"}"
+      done
+      echo ${output} | sed 's/^, //;s/.*/[&]/'
+    register: peers
+    delegate_to: localhost
+  - name: set peers 
+    set_fact:
+      peers: "{{ peers.stdout | from_json }}"
+  - name: create wg0.conf for master node
+    template:
+      src: wg0.master.conf
+      dest: /etc/wireguard/wg0.conf
+    vars:
+      privateKey: "{{ lookup('file', '{{ role_path }}/files/{{ wireguard_ip }}/privateKey') }}"
+      peers: "{{ peers }}"
+    become: yes
+  when: "'k3s_master' in group_names"
+  
+
+- name: Create wg0.conf for worker node
+  template:
+    src: wg0.worker.conf
+    dest: /etc/wireguard/wg0.conf
+  vars:
+    privateKey: "{{ lookup('file', '{{ role_path }}/files/{{ wireguard_ip }}/privateKey') }}"
+    peer:
+      publicKey: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/publicKey') }}"
+      endpoint:
+  become: yes
+  when: "'k3s_worker' in group_names"

@@ -4,6 +4,8 @@
 # k3s playbook should also be execute
 - name: Include k3s playbook to deploy on cloud and edge side
   ansible.builtin.import_playbook: k3s.yaml
+  vars:
+    architecture: "federated"
 
 - name: Include openfaas playbook to deploy on cloud and edge side
   ansible.builtin.import_playbook: openfaas.yaml

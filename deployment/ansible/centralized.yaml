@@ -1,9 +1,16 @@
 - name: Include common playbook for general setup
   ansible.builtin.import_playbook: common.yaml
 
+- name: Wireguard
+  hosts: all
+  roles:
+    - wireguard
+
 # k3s playbook should also be execute
 - name: Include k3s playbook to deploy on cloud and edge side
   ansible.builtin.import_playbook: k3s.yaml
+  vars:
+    architecture: "centralized"
 
 - name: Include openfaas playbook to deploy on cloud and edge side
   ansible.builtin.import_playbook: openfaas.yaml

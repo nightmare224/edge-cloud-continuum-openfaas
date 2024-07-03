@@ -1,0 +1,4 @@
+{% if architecture == 'centralized' %}
+flannel-iface: wg0
+node-ip: "{{ wireguard_ip }}"
+{% endif %}

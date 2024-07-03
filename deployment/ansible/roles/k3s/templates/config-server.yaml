@@ -1,6 +1,18 @@
 write-kubeconfig-mode: "0644"
-bind-address: "{{ ansible_host }}"
+node-external-ip: "{{ ansible_host }}"
 https-listen-port: 10443
-advertise-address: "{{ ansible_host }}"
 cluster-cidr: "10.42.0.0/16"
 service-cidr: "10.43.0.0/16"
+{% if architecture == 'centralized' %}
+flannel-iface: wg0
+advertise-address: "10.202.0.1"
+node-ip: "10.202.0.1"
+bind-address: "0.0.0.0"
+{% else %}
+advertise-address: "{{ ansible_host }}"
+bind-address: "{{ ansible_host }}"
+{% endif %}
+disable:
+  - "servicelb"
+  - "traefik"
+  - "metrics-server"

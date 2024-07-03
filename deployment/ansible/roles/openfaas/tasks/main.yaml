@@ -16,13 +16,6 @@
         ip: "{{ ansible_host }}"
       basicAuth:
         basicAuthPassword: "{{ faasclient_password }}"
-      # ingress:
-      #   hosts:
-      #   - host: "{{ hostname }}"
-      #     serviceName: gateway
-      #     servicePort: 8080
-      #     path: /
-      #   ingressClassName: "{{ ingressClassName }}"
     release_namespace: openfaas
     create_namespace: true
     wait: True
