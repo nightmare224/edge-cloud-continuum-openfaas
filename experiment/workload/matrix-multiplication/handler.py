@@ -8,7 +8,7 @@ def handle(req):
     mainStartTime = t.time()
 
     """This function will multiply two 2000 * 2000 matrices """
-    m = 2000
+    m = 200
     n = 1
 
     # Initialzing the two square matrices

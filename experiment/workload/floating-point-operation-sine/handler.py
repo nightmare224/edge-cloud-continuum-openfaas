@@ -5,7 +5,7 @@ from math import sin, pi
 def handle(req):
     """This function will calculate sine(360) multiple times"""
     startTime = t.time()
-    for i in range(5001):
+    for i in range(601):
         for x in range(361):
             result = sin(x*pi/180)
     endTime = t.time()
