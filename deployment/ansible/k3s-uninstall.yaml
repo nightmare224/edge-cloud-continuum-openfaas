@@ -1,0 +1,21 @@
+- name: Uninstall K3S server
+  hosts: k3s_master
+  tasks:
+  - name: Stop service
+    ansible.builtin.systemd_service:
+      name: k3s
+      state: stopped
+  - name: Uninstall
+    shell: /usr/local/bin/k3s-uninstall.sh
+  become: yes
+
+- name: Uninstall K3S agent
+  hosts: k3s_worker
+  tasks:
+  - name: Stop service
+    ansible.builtin.systemd_service:
+      name: k3s-agent
+      state: stopped
+  - name: Uninstall
+    shell: /usr/local/bin/k3s-agent-uninstall.sh
+  become: yes

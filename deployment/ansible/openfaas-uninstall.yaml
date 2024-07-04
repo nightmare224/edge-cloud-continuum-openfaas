@@ -1,0 +1,16 @@
+- name: Uninstall openfaas
+  hosts: master:&openfaas 
+  tasks:
+  - name: Fetch the kubeconfig file from all Kubernetes server
+    fetch:
+      src: "{{ kubeconfig_path }}"
+      dest: "{{ kubeconfig }}"
+      flat: true
+    become: yes
+  - name: helm uninstall
+    shell: helm uninstall -n openfaas openfaas
+    environment:
+      KUBECONFIG: "{{ kubeconfig }}"
+    delegate_to: localhost
+  vars:
+    kubeconfig: "/tmp/{{ inventory_hostname }}-kubeconfig"

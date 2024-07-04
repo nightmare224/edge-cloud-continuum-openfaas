@@ -18,10 +18,6 @@
       file:
         path: "{{ playbook_dir }}/roles/k3s/files/token"
         state: directory
-    # - name: Wireguard ip offset
-    #   copy:
-    #     content: "2"
-    #     dest: "{{ playbook_dir }}/roles/k3s/files/wireguard_ip"
 
 - name: Install K3S
   hosts: all
