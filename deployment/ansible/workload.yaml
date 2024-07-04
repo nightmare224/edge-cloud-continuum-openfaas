@@ -2,6 +2,10 @@
 - name: Create symbolic link
   hosts: localhost
   tasks:
+    - name: Create file
+      file:
+        path: "{{ playbook_dir }}/roles/workload/files/"
+        state: directory
     - name: Create workload
       ansible.builtin.file:
         src: "{{ playbook_dir }}/../../experiment/workload"

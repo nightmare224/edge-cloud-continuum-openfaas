@@ -24,6 +24,6 @@
     - faas_common
 
 - name: Common setup
-  hosts: master #on_premise:&master
+  hosts: all
   roles:
     - common

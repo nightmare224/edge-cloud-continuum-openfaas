@@ -38,6 +38,17 @@
         - docker.io/nightmare224/sorter:latest
   become: yes
 
+- name: Install faas-cli
+  hosts: localhost
+  tasks:
+    - name: Check exist
+      command: faas-cli version
+      register: faas_cli
+      failed_when: false
+    - name: Install faas_cli
+      shell: curl -sSL https://cli.openfaas.com | sudo sh
+      when: "faas_cli.rc != 0"
+
 - name: Login openfaas
   hosts: master
   tasks:
@@ -50,6 +61,9 @@
       command: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
       delegate_to: localhost
 
+- name: Include workload playbook
+  ansible.builtin.import_playbook: workload.yaml
+
 - name: Remove openfaas function on edge
   hosts: edge:&master
   tasks:
@@ -57,8 +71,7 @@
       command: faas-cli remove --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f ./roles/workload/files/workload/stack.yaml
       delegate_to: localhost
 
-- name: Include workload playbook
-  ansible.builtin.import_playbook: workload.yaml
+
 
 # - name: Trigger experiment
 #   hosts: localhost
