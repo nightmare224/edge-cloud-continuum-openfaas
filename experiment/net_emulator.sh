@@ -3,7 +3,7 @@
 
 DELAY_CLASS1="10ms"
 DELAY_CLASS2="20ms"
-DELAY_CLASS3="50ms"
+DELAY_CLASS3="100ms"
 
 function filter_to_class() {
     log "INFO" "Apply filter class$3 on interface $1 for ip $2 "
@@ -123,10 +123,22 @@ main() {
         done
     # Is cloud cluster
     else
+        # To edge cluster
         cluster_id=1
         for (( ; ; )); do
             group_name="edge_cluster${cluster_id}"
             apply_filter ${inventory_file} ${group_name} ${self_ip} "filter_to_class3"
+            ret_val=$?
+            if [[ ${ret_val} != 0 ]]; then
+                break
+            fi
+            ((cluster_id++))
+        done
+        # To cloud cluster
+        cluster_id=1
+        for (( ; ; )); do
+            group_name="cloud_cluster${cluster_id}"
+            apply_filter ${inventory_file} ${group_name} ${self_ip} "filter_to_class1"
             ret_val=$?
             if [[ ${ret_val} != 0 ]]; then
                 break

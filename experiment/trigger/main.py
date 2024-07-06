@@ -5,7 +5,7 @@ import shutil
 import glob
 import pandas as pd
 from locustfile.runner import run
-from prometheus.metrics import cpu_avg_utilization, memory_avg_utilization, create_prom_client_dict
+from prometheus.metrics import cpu_avg_utilization, memory_avg_utilization, invocation_count, create_prom_client_dict
 from datetime import datetime
 from time import sleep
 
@@ -29,6 +29,7 @@ if __name__ == "__main__":
     prom_client_dict = create_prom_client_dict(args.config_prom)
     df_metrics = pd.DataFrame(columns = ["cpu", "memory"])
     df_metrics.index.name = "hostname"
+    df_invocation = pd.DataFrame(columns = ["hostname", "function_name", "invocation"])
     for url in prom_client_dict:
         # cpu
         cpu = cpu_avg_utilization(prom_client_dict[url], start_time, end_time)
@@ -39,8 +40,14 @@ if __name__ == "__main__":
         memory = memory_avg_utilization(prom_client_dict[url], start_time, end_time)
         for hostname in memory:
             df_metrics.loc[hostname.split(':')[0], "memory"] = memory[hostname]
-
+        
+        hostname = url.split('http://')[1].split(':')[0]
+        invocation = invocation_count(prom_client_dict[url], start_time, end_time)
+        for function_name in invocation:
+            df_invocation.loc[len(df_invocation)] = [hostname, function_name, invocation[function_name]]
 
     df_metrics.reset_index(inplace = True)
     print(df_metrics)
+    print(df_invocation)
     df_metrics.to_csv(f"{args.casename}_metrics.csv", index = False)
+    df_invocation.to_csv(f"{args.casename}_invocation_count.csv", index = False)

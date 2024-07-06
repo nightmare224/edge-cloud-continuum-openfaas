@@ -5,7 +5,7 @@ containerd_version: v1.7.0
 k3s_version: v1.29.5+k3s1
 openfaas_helm_version: 14.2.31
 openfaas_gateway_image: nightmare224/faas-gateway-offload:0.0.19
-openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.165
+openfaas_netes_image: docker.io/nightmare224/faas-netes-offload:0.0.166
 
 # hostalias:
 # - ip: 10.211.55.24

@@ -62,3 +62,23 @@ def memory_avg_utilization(prom, start_time, end_time):
         result[instance_url] = np.average(arr) / 1024 / 1024
 
     return result
+
+def invocation_count(prom, start_time, end_time):
+    start_time = parse_datetime(start_time)
+    end_time = parse_datetime(end_time)
+    query = "sum by (function_name) (gateway_function_invocation_total)"
+    metric_data = prom.custom_query_range(
+        query = query,
+        start_time=start_time,
+        end_time=end_time,
+        step = '1s'
+    )
+    query = "sum by (function_name) (gateway_function_invocation_total)"
+    result = {}
+    for data in metric_data:
+        val = data['values']
+        function_name = data["metric"]["function_name"]
+        count = int(val[-1][1]) - int(val[0][1])
+        result[function_name] = count
+
+    return result

@@ -1,8 +1,11 @@
 - name: Include common playbook for general setup
   ansible.builtin.import_playbook: common.yaml
 
+# the cloud still remain federated
 - name: Include openfaas playbook to deploy on cloud side
   ansible.builtin.import_playbook: openfaas.yaml
-
+  vars:
+    architecture: "federated"
+    
 - name: Include faasd playbook to deploy on edge side
   ansible.builtin.import_playbook: faasd.yaml
