@@ -80,7 +80,7 @@ data:
       - name: openfaas
         rules:
         - alert: SlowRequest
-          expr: (sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) > 1.5
+          expr: expr: ((sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) > 1.5) or topk(1, sum by (function_name) (increase(gateway_functions_seconds_count[30s])) > 1) and ignoring (instance, function_name) ((avg by (instance) (1 - (rate(node_cpu_seconds_total{mode="idle"}[30s]))) > 0.95) or (avg by (instance) (1 - ((avg_over_time(node_memory_MemFree_bytes[30s]) + avg_over_time(node_memory_Cached_bytes[30s]) + avg_over_time(node_memory_Buffers_bytes[30s])) / node_memory_MemTotal_bytes)) > 0.95))
           for: 20s
           labels:
             service: gateway
@@ -93,13 +93,6 @@ data:
             service: gateway
             serverity: major
             receiver: scale
-        # - alert: IdleService
-        #   expr: ((sum by (function_name) (increase(gateway_functions_seconds_sum{code="200"}[30s]) / increase(gateway_functions_seconds_count{code="200"}[30s])) / sum by (function_name) (gateway_function_fastest_response)) < 2) + (sum by (function_name) (gateway_service_count) > 1)
-        #   for: 20s
-        #   labels:
-        #     service: gateway
-        #     serverity: major
-        #     receiver: scale
 
 {{- end }}
 {{- end }}
