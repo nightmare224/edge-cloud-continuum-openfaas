@@ -1,3 +1,3 @@
 # for experiment
 faasgateway_port: 8080
-faasclient_port: 8081
+faasclient_port: 8080

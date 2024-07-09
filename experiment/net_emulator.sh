@@ -4,6 +4,7 @@
 DELAY_CLASS1="10ms"
 DELAY_CLASS2="20ms"
 DELAY_CLASS3="100ms"
+DELAY_CLASS4="0ms"
 
 function filter_to_class() {
     log "INFO" "Apply filter class$3 on interface $1 for ip $2 "
@@ -21,6 +22,10 @@ function filter_to_class2() {
 
 function filter_to_class3() {
     filter_to_class $1 $2 "3"
+}
+
+function default_filter_to_class4() {
+    filter_to_class $1 0.0.0.0 "4"
 }
 
 function apply_filter() {
@@ -78,7 +83,7 @@ main() {
         exit 0
     fi
 
-    tc qdisc add dev ${interface} root handle 1:0 prio 2>&1 
+    tc qdisc add dev ${interface} root handle 1:0 prio bands 4 2>&1 
     ret_val=$?
     if [[ ${ret_val} != 0 ]]; then
         log "ERROR" "Add root qdisc failed"     
@@ -87,7 +92,9 @@ main() {
     tc qdisc add dev ${interface} parent 1:1 handle 10:1 netem delay ${DELAY_CLASS1}
     tc qdisc add dev ${interface} parent 1:2 handle 20:1 netem delay ${DELAY_CLASS2}
     tc qdisc add dev ${interface} parent 1:3 handle 30:1 netem delay ${DELAY_CLASS3}
-
+    # default class and filter (for client)
+    tc qdisc add dev ${interface} parent 1:4 handle 40:1 netem delay ${DELAY_CLASS4}
+    default_filter_to_class4 ${interface}
 
     # Is edge cluster
     if echo ${self_group} | grep -q "edge"; then
