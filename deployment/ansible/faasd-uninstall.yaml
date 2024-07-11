@@ -1,0 +1,19 @@
+- name: Uninstall faasd
+  hosts: master:&faasd
+  tasks:
+  - name: Stop faasd-provider
+    systemd_service:
+      name: faasd-provider
+      state: stopped
+  - name: Stop faasd
+    systemd_service:
+      name: faasd
+      state: stopped
+  - name: Pause for 10 seconds to stop service
+    ansible.builtin.pause:
+      seconds: 10
+  - name: Remove unknown faasd process
+    shell: ps aux | grep faasd | awk '{print $2}' | xargs kill -9 2>/dev/null
+    ignore_errors: true
+    failed_when: false
+  become: yes

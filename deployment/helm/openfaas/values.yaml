@@ -408,7 +408,8 @@ ingressOperator:
       memory: "25Mi"
       cpu: "50m"
 
-nodeSelector: {}
+nodeSelector:
+  node-role.kubernetes.io/master: "true"
 
 tolerations: []
 

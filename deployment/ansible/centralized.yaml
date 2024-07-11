@@ -6,6 +6,8 @@
   tasks:
     - name: Check if wiregurad is set
       command: ip a show dev wg0
+      failed_when: false
+      ignore_errors: true
       register: wg_install
     - name: Run wireguard role
       include_role:
