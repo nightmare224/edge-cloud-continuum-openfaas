@@ -1,0 +1,144 @@
+{  
+    "case0": {
+        "user_count": 0,
+        "spawn_rate": 0,
+        "runtime_second": 30,
+        "user_type": "CPUUser",
+        "user_host":[]
+    },
+    "case1": {
+        "user_count": 1,
+        "spawn_rate": 1,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case2": {
+        "user_count": 2,
+        "spawn_rate": 2,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case3": {
+        "user_count": 3,
+        "spawn_rate": 3,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case4": {
+        "user_count": 4,
+        "spawn_rate": 4,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case5": {
+        "user_count": 5,
+        "spawn_rate": 5,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case6": {
+        "user_count": 6,
+        "spawn_rate": 6,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case7": {
+        "user_count": 7,
+        "spawn_rate": 7,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case8": {
+        "user_count": 8,
+        "spawn_rate": 8,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case9": {
+        "user_count": 9,
+        "spawn_rate": 9,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case10": {
+        "user_count": 10,
+        "spawn_rate": 10,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case11": {
+        "user_count": 11,
+        "spawn_rate": 11,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case12": {
+        "user_count": 12,
+        "spawn_rate": 12,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case13": {
+        "user_count": 13,
+        "spawn_rate": 13,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case14": {
+        "user_count": 14,
+        "spawn_rate": 14,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    },
+    "case15": {
+        "user_count": 15,
+        "spawn_rate": 15,
+        "runtime_second": 120,
+        "user_type": "CPUUser",
+        "user_host":[
+            "http://145.100.135.86:31112"
+        ]
+    }
+}

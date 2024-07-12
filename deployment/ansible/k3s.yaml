@@ -20,6 +20,8 @@
         state: directory
 
 - name: Install K3S
-  hosts: all
+  hosts: 
+    - k3s_master
+    - k3s_worker
   roles:
     - k3s

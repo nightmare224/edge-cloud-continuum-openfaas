@@ -20,6 +20,6 @@
     create_namespace: true
     wait: True
     timeout: 600s
-    kubeconfig: "openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
+    kubeconfig: "openfaas/kubeconfig/{{ group_names[1] }}-kubeconfig"
   delegate_to: localhost
   tags: openfaas_helm_update

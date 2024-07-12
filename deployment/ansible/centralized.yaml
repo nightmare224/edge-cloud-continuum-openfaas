@@ -1,6 +1,9 @@
 - name: Include common playbook for general setup
   ansible.builtin.import_playbook: common.yaml
 
+- name: Include network topology playbook for all
+  ansible.builtin.import_playbook: topology.yaml
+
 - name: Setup Wireguard
   hosts: all
   tasks:
@@ -22,3 +25,5 @@
 
 - name: Include openfaas playbook to deploy on cloud and edge side
   ansible.builtin.import_playbook: openfaas.yaml
+  vars:
+    architecture: "centralized"

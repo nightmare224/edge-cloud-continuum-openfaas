@@ -30,10 +30,25 @@
     - name: Fetch from the cluster
       fetch:
         src: "{{ kubeconfig_path }}"
-        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ inventory_hostname }}-kubeconfig"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ group_names[1] }}-kubeconfig"
         flat: true
       become: yes
 
+- name: Reconfig the hostname of kubeconfig file
+  hosts: localhost
+  tasks:
+    - name: Change ip o hostname
+      shell: sed -i 's/0.0.0.0/kubernetes/' {{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/cloud_cluster1-kubeconfig
+      when: "architecture == 'centralized'"
+    - name: Add ip to hostname in /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ ip }} kubernetes"
+        regexp: '.* kubernetes'
+      vars:
+        ip: "{{ lookup('file', '{{ playbook_dir }}/roles/k3s/files/hostname/cloud_cluster1') }}"
+      become: yes
+      when: "architecture == 'centralized'"
 
 - name: Copy required configs to the Helm chart
   hosts: master #on_premise:&master 

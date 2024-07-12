@@ -1,0 +1,24 @@
+---
+- name: Generate inventory file in json format
+  hosts: localhost
+  tasks:
+    - name: register json format
+      command: ansible-inventory -i {{ ansible_inventory_sources[0] }} --list
+      register: inventory_content
+    - name: output file
+      copy:
+        content: "{{ inventory_content.stdout }}"
+        dest: "{{ playbook_dir }}/roles/topology/files/inventory.json"
+
+- name: Emulate network toplology
+  hosts: all
+  roles:
+    - topology
+
+# temporary, should not be hard code in future
+- name: For client side
+  hosts: 
+    - peerA-1
+  tasks:
+    - command: tc filter add dev eth0 parent 1:0 protocol ip prio 1 u32 match ip dst 192.168.100.112 flowid 1:4
+      become: yes

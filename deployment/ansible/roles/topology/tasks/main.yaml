@@ -1,0 +1,16 @@
+---
+- name: Install require tool
+  apt:
+    name: jq
+  become: yes
+
+- name: Upload inventory file
+  copy: 
+    src: "{{ role_path }}/files/inventory.json"
+    dest: /tmp/inventory.json
+
+- name: Execute emulate script
+  script: 
+    cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json {{ ansible_host }} {{ group_names[1] }}"
+    chdir: /tmp/
+  become: yes

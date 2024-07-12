@@ -19,3 +19,16 @@
   - name: Uninstall
     shell: /usr/local/bin/k3s-agent-uninstall.sh
   become: yes
+
+- name: Uninstall Wireguard
+  hosts: all
+  tasks:
+    - name: Check if wiregurad is set
+      command: ip a show dev wg0
+      failed_when: false
+      ignore_errors: true
+      register: wg_install
+    - name: Turn down wireguard
+      command: wg-quick down wg0
+      become: yes
+      when: "wg_install.rc == 0"
