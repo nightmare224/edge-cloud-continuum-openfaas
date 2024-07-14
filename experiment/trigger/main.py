@@ -7,6 +7,7 @@ import pandas as pd
 from locustfile.runner import run
 from prometheus.metrics import cpu_avg_utilization, memory_avg_utilization, invocation_count, create_prom_client_dict
 from datetime import datetime
+from datetime import timedelta
 from time import sleep
 
 if __name__ == "__main__":
@@ -19,11 +20,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ### run workload by locust ###
+    scrape_interval = timedelta(seconds = 20) 
     print(f"Running test case '{args.casename}'...")
     start_time = datetime.now()
     run(args.config_locust, args.casename)
     end_time = datetime.now()
     print("\nDone")
+    print(f"Sleep {scrape_interval.seconds} seconds to wait result to come in...")
+    sleep(scrape_interval.seconds)
+
 
     # ### gather resource metric from prometheus ###
     prom_client_dict = create_prom_client_dict(args.config_prom)
@@ -42,7 +47,8 @@ if __name__ == "__main__":
             df_metrics.loc[hostname.split(':')[0], "memory"] = memory[hostname]
         
         hostname = url.split('http://')[1].split(':')[0]
-        invocation = invocation_count(prom_client_dict[url], start_time, end_time)
+        # the scape interval is 15 in prometheus
+        invocation = invocation_count(prom_client_dict[url], start_time, end_time + scrape_interval)
         for function_name in invocation:
             df_invocation.loc[len(df_invocation)] = [hostname, function_name, invocation[function_name]]
 

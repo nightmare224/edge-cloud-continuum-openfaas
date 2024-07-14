@@ -1,10 +1,22 @@
 from locust import HttpUser, TaskSet, task, tag
+import uuid
+
+user_request_target = 700
+user_request_count_map = {}
 
 ### Task ###
 class ExampleBenchmark(TaskSet):
     @task
     def nodeinfo(self):
         self.client.get("/function/nodeinfo")
+
+        # to control total invocation
+        global user_request_count_map
+        global user_request_target
+        user_request_count_map[self.user_id] += 1
+        if user_request_count_map[self.user_id] == user_request_target:
+            self._state = "stopping"
+            del user_request_count_map[self.user_id]
 
 class MicroBenchmark(TaskSet):
     @tag('memory', 'cpu')
@@ -16,6 +28,14 @@ class MicroBenchmark(TaskSet):
     @task
     def floating_point_operation_sine(self):
         self.client.get("/function/floating-point-operation-sine")
+
+        # to control total invocation
+        global user_request_count_map
+        global user_request_target
+        user_request_count_map[self.user_id] += 1
+        if user_request_count_map[self.user_id] == user_request_target:
+            self._state = "stopping"
+            del user_request_count_map[self.user_id]
 
     @tag('memory')
     @task
@@ -31,12 +51,41 @@ class MicroBenchmark(TaskSet):
 class IdleUser(HttpUser):
     tasks = []
 
+class ExampleUser(HttpUser):
+    def on_start(self):
+        global user_request_count_map
+        self.user_id = str(uuid.uuid4())
+        user_request_count_map[self.user_id] = 0
+    def on_stop(self):
+        global user_request_count_map
+        if len(user_request_count_map):
+            self.environment.runner.quit()
+    
+    tasks = [ExampleBenchmark.nodeinfo]
 
 class CPUUser(HttpUser):
+    def on_start(self):
+        global user_request_count_map
+        self.user_id = str(uuid.uuid4())
+        user_request_count_map[self.user_id] = 0
+    def on_stop(self):
+        global user_request_count_map
+        if len(user_request_count_map):
+            self.environment.runner.quit()
+
     tasks = [MicroBenchmark.floating_point_operation_sine]
 
 
 class MemoryUser(HttpUser):
+    def on_start(self):
+        global user_request_count_map
+        self.user_id = str(uuid.uuid4())
+        user_request_count_map[self.user_id] = 0
+    def on_stop(self):
+        global user_request_count_map
+        if len(user_request_count_map):
+            self.environment.runner.quit()
+            
     tasks = [MicroBenchmark.floating_point_operation_sine]
 
 

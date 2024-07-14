@@ -50,7 +50,7 @@ def run(config_filename, casename):
     # runner.start(user_count = int(config["user_count"]))
 
     # in 10 seconds stop the runner
-    gevent.spawn_later(int(config["runtime_second"]), runner.quit)
+    # gevent.spawn_later(int(config["runtime_second"]), runner.quit)
 
     # wait for the greenlets
     env.runner.greenlet.join()
