@@ -1,7 +1,7 @@
 from locust import HttpUser, TaskSet, task, tag
 import uuid
 
-user_request_target = 700
+user_request_target = 500
 user_request_count_map = {}
 
 ### Task ###
