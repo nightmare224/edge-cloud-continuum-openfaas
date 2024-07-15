@@ -58,7 +58,7 @@ class ExampleUser(HttpUser):
         user_request_count_map[self.user_id] = 0
     def on_stop(self):
         global user_request_count_map
-        if len(user_request_count_map):
+        if len(user_request_count_map) == 0:
             self.environment.runner.quit()
     
     tasks = [ExampleBenchmark.nodeinfo]
@@ -70,7 +70,7 @@ class CPUUser(HttpUser):
         user_request_count_map[self.user_id] = 0
     def on_stop(self):
         global user_request_count_map
-        if len(user_request_count_map):
+        if len(user_request_count_map) == 0:
             self.environment.runner.quit()
 
     tasks = [MicroBenchmark.floating_point_operation_sine]
@@ -83,7 +83,7 @@ class MemoryUser(HttpUser):
         user_request_count_map[self.user_id] = 0
     def on_stop(self):
         global user_request_count_map
-        if len(user_request_count_map):
+        if len(user_request_count_map) == 0:
             self.environment.runner.quit()
             
     tasks = [MicroBenchmark.floating_point_operation_sine]
