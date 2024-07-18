@@ -1,3 +1,13 @@
+- name: Fetch the kubeconfig file from all Kubernetes server
+  hosts: master:&openfaas 
+  tasks:
+    - name: Fetch from the cluster
+      fetch:
+        src: "{{ kubeconfig_path }}"
+        dest: "{{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/{{ group_names[1] }}-kubeconfig"
+        flat: true
+      become: yes
+      
 - name: Uninstall openfaas
   hosts: master:&openfaas 
   tasks:

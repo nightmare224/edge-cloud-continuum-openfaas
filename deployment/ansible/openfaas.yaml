@@ -37,7 +37,7 @@
 - name: Reconfig the hostname of kubeconfig file
   hosts: localhost
   tasks:
-    - name: Change ip o hostname
+    - name: Change ip and hostname
       shell: sed -i 's/0.0.0.0/kubernetes/' {{ playbook_dir }}/roles/openfaas/files/openfaas/kubeconfig/cloud_cluster1-kubeconfig
       when: "architecture == 'centralized'"
     - name: Add ip to hostname in /etc/hosts
