@@ -3,49 +3,73 @@ provider:
   name: openfaas
   gateway: http://127.0.0.1:8080
 functions:
-  matrix-multiplication:
+  resize-image:
     # lang: python3-debian
     lang: dockerfile
-    handler: ./matrix-multiplication
-    image: nightmare224/matrix-multiplication:latest
+    handler: ./resize-image
+    image: nightmare224/resize-image:latest
     environment:
       read_timeout: 0
       write_timeout: 0
       exec_timeout: 0
     labels:
       com.openfaas.scale.min: 1
-  floating-point-operation-sine:
-    # lang: python3-debian
-    lang: dockerfile
-    handler: ./floating-point-operation-sine
-    image: nightmare224/floating-point-operation-sine:latest
-    environment:
-      read_timeout: 0
-      write_timeout: 0
-      exec_timeout: 0
-    labels:
-      com.openfaas.scale.min: 1
-  sorter:
-    lang: dockerfile
-    handler: ./sorter
-    image: nightmare224/sorter:latest
-    environment:
-        read_timeout: 0
-        write_timeout: 0
-        exec_timeout: 0
-    labels:
-      com.openfaas.scale.min: 1
-  dd-cmd: 
-    # lang: python3-debian
-    lang: dockerfile
-    handler: ./dd-cmd
-    image: nightmare224/dd-cmd:latest
-    environment:
-      read_timeout: 0
-      write_timeout: 0
-      exec_timeout: 0
-    labels:
-      com.openfaas.scale.min: 1
+    build_args:
+      ADDITIONAL_PACKAGE: "libgl1"
+  # memory-allocation:
+  #   lang: python3-debian
+  #   # lang: dockerfile
+  #   handler: ./memory-allocation
+  #   image: nightmare224/memory-allocation:latest
+  #   environment:
+  #     read_timeout: 0
+  #     write_timeout: 0
+  #     exec_timeout: 0
+  #   labels:
+  #     com.openfaas.scale.min: 1
+  # matrix-multiplication:
+  #   # lang: python3-debian
+  #   lang: dockerfile
+  #   handler: ./matrix-multiplication
+  #   image: nightmare224/matrix-multiplication:latest
+  #   environment:
+  #     read_timeout: 0
+  #     write_timeout: 0
+  #     exec_timeout: 0
+  #   labels:
+  #     com.openfaas.scale.min: 1
+  # floating-point-operation-sine:
+  #   # lang: python3-debian
+  #   lang: dockerfile
+  #   handler: ./floating-point-operation-sine
+  #   image: nightmare224/floating-point-operation-sine:latest
+  #   environment:
+  #     read_timeout: 0
+  #     write_timeout: 0
+  #     exec_timeout: 0
+  #   labels:
+  #     com.openfaas.scale.min: 1
+  # sorter:
+  #   lang: dockerfile
+  #   handler: ./sorter
+  #   image: nightmare224/sorter:latest
+  #   environment:
+  #       read_timeout: 0
+  #       write_timeout: 0
+  #       exec_timeout: 0
+  #   labels:
+  #     com.openfaas.scale.min: 1
+  # dd-cmd: 
+  #   # lang: python3-debian
+  #   lang: dockerfile
+  #   handler: ./dd-cmd
+  #   image: nightmare224/dd-cmd:latest
+  #   environment:
+  #     read_timeout: 0
+  #     write_timeout: 0
+  #     exec_timeout: 0
+  #   labels:
+  #     com.openfaas.scale.min: 1
   # iperf3:
   #   lang: python3-debian
   #   # lang: dockerfile
