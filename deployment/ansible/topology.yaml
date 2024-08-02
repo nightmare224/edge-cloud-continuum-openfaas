@@ -11,14 +11,37 @@
         dest: "{{ playbook_dir }}/roles/topology/files/inventory.json"
 
 - name: Emulate network toplology
-  hosts: all
+  hosts: 
+    - all
+    - localhost
   roles:
     - topology
 
 # temporary, should not be hard code in future
-- name: For client side
-  hosts: 
-    - peerA-1
-  tasks:
-    - command: tc filter add dev eth0 parent 1:0 protocol ip prio 1 u32 match ip dst 192.168.100.112 flowid 1:4
-      become: yes
+# - name: For client side
+#   hosts: 
+#     - peerA-1
+#     # - edge
+#   tasks:
+#     - name: For the anisble node
+#       command: tc filter add dev eth0 parent 1:0 protocol ip prio 1 u32 match ip dst 192.168.100.112 flowid 1:4
+#       become: yes
+#     - name: For the minio database
+#       command: tc filter add dev eth0 parent 1:0 protocol ip prio 1 u32 match ip dst 192.168.100.100 flowid 1:4
+#       become: yes
+
+# - name: For client side to cloud
+#   hosts: 
+#     - cloud:&master
+#   tasks:
+#     - name: For the anisble node
+#       command: tc filter add dev eth0 parent 1:0 protocol ip prio 1 u32 match ip dst 192.168.100.112 flowid 1:3
+#       become: yes
+
+# - name: For client side to cloud
+#   hosts: 
+#     - localhost
+#   tasks:
+#     - name: test
+#       debug:
+#         msg: "ansible host: {{ ansible_host }}, group name: {{ group_names }}"
