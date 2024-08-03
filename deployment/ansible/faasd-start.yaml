@@ -1,0 +1,19 @@
+- name: Start faasd
+  hosts: master:&faasd
+  gather_facts: no
+  tasks:
+  - name: Start faasd
+    systemd_service:
+      name: faasd
+      state: started
+  - name: Pause for 10 seconds to start faasd
+    ansible.builtin.pause:
+      seconds: 10
+  - name: Start faasd-provider
+    systemd_service:
+      name: faasd-provider
+      state: started
+  # - name: Pause for 10 seconds to start faasd-provider
+  #   ansible.builtin.pause:
+  #     seconds: 10
+  become: yes

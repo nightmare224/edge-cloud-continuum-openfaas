@@ -3,7 +3,7 @@
 
 DELAY_CLASS1="10ms"
 DELAY_CLASS2="20ms"
-DELAY_CLASS3="100ms"
+DELAY_CLASS3="60ms"
 DELAY_CLASS4="0ms"
 
 function filter_to_class() {
@@ -24,8 +24,16 @@ function filter_to_class3() {
     filter_to_class $1 $2 "3"
 }
 
+function filter_to_class4() {
+    filter_to_class $1 $2 "4"
+}
+
+function default_filter_to_class3() {
+    tc filter add dev $1 parent 1:0 protocol ip prio 100 u32 match u32 0 0 flowid 1:3
+}
+
 function default_filter_to_class4() {
-    filter_to_class $1 0.0.0.0 "4"
+    tc filter add dev $1 parent 1:0 protocol ip prio 100 u32 match u32 0 0 flowid 1:4
 }
 
 function apply_filter() {
@@ -94,10 +102,16 @@ main() {
     tc qdisc add dev ${interface} parent 1:3 handle 30:1 netem delay ${DELAY_CLASS3}
     # default class and filter (for client)
     tc qdisc add dev ${interface} parent 1:4 handle 40:1 netem delay ${DELAY_CLASS4}
-    default_filter_to_class4 ${interface}
+    
+    if [[ ${inventory_file} == "" ]]; then
+        log "INFO" "No inventory file provided, all traffic is set to ${DELAY_CLASS4} delay."
+        default_filter_to_class4 ${interface}
+        exit 0
+    fi
 
     # Is edge cluster
     if echo ${self_group} | grep -q "edge"; then
+        log "INFO" "Apply filter for the edge node."
         # To other edge cluster
         cluster_id=1
         for (( ; ; )); do
@@ -128,8 +142,11 @@ main() {
             fi
             ((cluster_id++))
         done
+        log "INFO" "Default filter of edge is set to ${DELAY_CLASS4} delay."
+        default_filter_to_class4 ${interface}
     # Is cloud cluster
-    else
+    elif echo ${self_group} | grep -q "cloud"; then
+        log "INFO" "Apply filter for the cloud node."
         # To edge cluster
         cluster_id=1
         for (( ; ; )); do
@@ -152,6 +169,34 @@ main() {
             fi
             ((cluster_id++))
         done
+        log "INFO" "Default filter of cloud is set to ${DELAY_CLASS3} delay."
+        default_filter_to_class3 ${interface}
+    elif echo ${self_group} | grep -q "client"; then
+        log "INFO" "Apply filter for the client node."
+        # To edge cluster
+        cluster_id=1
+        for (( ; ; )); do
+            group_name="edge_cluster${cluster_id}"
+            apply_filter ${inventory_file} ${group_name} ${self_ip} "filter_to_class4"
+            ret_val=$?
+            if [[ ${ret_val} != 0 ]]; then
+                break
+            fi
+            ((cluster_id++))
+        done
+        # To cloud cluster
+        cluster_id=1
+        for (( ; ; )); do
+            group_name="cloud_cluster${cluster_id}"
+            apply_filter ${inventory_file} ${group_name} ${self_ip} "filter_to_class3"
+            ret_val=$?
+            if [[ ${ret_val} != 0 ]]; then
+                break
+            fi
+            ((cluster_id++))
+        done
+        log "INFO" "Default filter of client is set to ${DELAY_CLASS4} delay."
+        default_filter_to_class4 ${interface}
     fi
 
 

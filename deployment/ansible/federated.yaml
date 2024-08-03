@@ -12,3 +12,5 @@
 
 - name: Include openfaas playbook to deploy on cloud and edge side
   ansible.builtin.import_playbook: openfaas.yaml
+  vars:
+    architecture: "federated"

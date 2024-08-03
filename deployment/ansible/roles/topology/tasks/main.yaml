@@ -10,7 +10,15 @@
     dest: /tmp/inventory.json
 
 - name: Execute emulate script
-  script: 
-    cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json {{ ansible_host }} {{ group_names[1] }}"
-    chdir: /tmp/
+  block:
+  - name: For the compute nodes
+    script: 
+      cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json {{ ansible_host }} {{ group_names[1] }}"
+      chdir: /tmp/
+    when: ansible_host != "127.0.0.1"
+  - name: For the ansible nodes (client)
+    script: 
+      cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json localhost client"
+      chdir: /tmp/
+    when: ansible_host == "127.0.0.1"
   become: yes
