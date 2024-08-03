@@ -15,10 +15,15 @@
     script: 
       cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json {{ ansible_host }} {{ group_names[1] }}"
       chdir: /tmp/
-    when: ansible_host != "127.0.0.1"
+    when: "'cloud' in group_names or 'edge' in group_names"
   - name: For the ansible nodes (client)
     script: 
       cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json localhost client"
       chdir: /tmp/
     when: ansible_host == "127.0.0.1"
+  - name: For the database (experiment)
+    script: 
+      cmd: "{{ role_path }}/files/net_emulator.sh /tmp/inventory.json database client"
+      chdir: /tmp/
+    when: "'experiment' in group_names"
   become: yes

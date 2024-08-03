@@ -11,8 +11,9 @@
   become: yes
 
 - name: Generate keypair
-  shell: wg genkey | tee privateKey | wg pubkey > publicKey
+  shell: wg genkey | tee wireguard-privateKey | wg pubkey > wireguard-publicKey
   args:
+    creates: /home/{{ ansible_user }}/infra/wireguard-privateKey
     chdir: /home/{{ ansible_user }}/infra/
 
 - name: Obtain wireguard private and public key
@@ -24,7 +25,7 @@
     delegate_to: localhost
   - name: Fetch private and public key
     fetch:
-      src: /home/{{ ansible_user }}/infra/{{ item }}
+      src: /home/{{ ansible_user }}/infra/wireguard-{{ item }}
       dest: "{{ role_path }}/files/{{ wireguard_ip }}/{{ item }}"
       flat: true
     loop:
@@ -66,7 +67,7 @@
       echo ${output} | sed 's/^, //;s/.*/[&]/'
     register: peers
     delegate_to: localhost
-  - name: set peers 
+  - name: Set peers 
     set_fact:
       peers: "{{ peers.stdout | from_json }}"
   - name: create wg0.conf for master node
@@ -90,7 +91,7 @@
       publicKey: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/publicKey') }}"
       endpoint: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/endpoint') }}"
   become: yes
-  when: "'k3s_worker' in group_names"
+  when: "'k3s_worker' in group_names or 'experiment' in group_names"
 
 
 - name: start wireguard
