@@ -11,9 +11,7 @@
         dest: "{{ playbook_dir }}/roles/topology/files/inventory.json"
 
 - name: Emulate network toplology
-  hosts: 
-    - all
-    - localhost
+  hosts: all, localhost
   roles:
     - topology
 
