@@ -37,7 +37,7 @@
     content: "{{ ansible_host }}"
     dest: "{{ role_path }}/files/{{ wireguard_ip }}/endpoint"
   delegate_to: localhost
-  when: "'k3s_master' in group_names"
+  # when: "'k3s_master' in group_names"
 
 - name: Create wg0.conf for master node
   block:
@@ -50,17 +50,10 @@
       - add-nat.sh
       - del-nat.sh
     become: yes
-  - name: Find ip directory
-    find:
-      paths: "{{ role_path }}/files"
-      file_type: directory
-      excludes: '10.202.0.1'
-    register: ip_dirpath
-    delegate_to: localhost
   - name: generate peer id list
     shell: |
       output=""
-      for i in $(ls {{ role_path }}/files/ | grep 10); do
+      for i in $(ls {{ role_path }}/files/ | grep '10.202.0.[0-9]*'); do
         publicKey=$(cat {{ role_path }}/files/${i}/publicKey)
         output="${output}, {\"ip\": \"${i}\", \"publicKey\": \"${publicKey}\"}"
       done
@@ -78,20 +71,37 @@
       privateKey: "{{ lookup('file', '{{ role_path }}/files/{{ wireguard_ip }}/privateKey') }}"
       peers: "{{ peers }}"
     become: yes
-  when: "'k3s_master' in group_names"
+  when: "'master' in group_names and 'cloud' in group_names"
   
 
 - name: Create wg0.conf for worker node
-  template:
-    src: wg0.worker.conf
-    dest: /etc/wireguard/wg0.conf
-  vars:
-    privateKey: "{{ lookup('file', '{{ role_path }}/files/{{ wireguard_ip }}/privateKey') }}"
-    peer:
-      publicKey: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/publicKey') }}"
-      endpoint: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/endpoint') }}"
-  become: yes
-  when: "'k3s_worker' in group_names or 'experiment' in group_names"
+  block:
+  - name: generate peer id list
+    shell: |
+      output=""
+      for i in $(ls {{ role_path }}/files/ | grep '10.202.0.[0-9]*'); do
+        publicKey=$(cat {{ role_path }}/files/${i}/publicKey)
+        endpoint=$(cat {{ role_path }}/files/${i}/endpoint)
+        output="${output}, {\"ip\": \"${i}\", \"publicKey\": \"${publicKey}\", \"endpoint\": \"${endpoint}\"}"
+      done
+      echo ${output} | sed 's/^, //;s/.*/[&]/'
+    register: peers
+    delegate_to: localhost
+  - name: Set peers 
+    set_fact:
+      peers: "{{ peers.stdout | from_json }}"
+  - name: create wg0.conf for worker node
+    template:
+      src: wg0.worker.conf
+      dest: /etc/wireguard/wg0.conf
+    vars:
+      privateKey: "{{ lookup('file', '{{ role_path }}/files/{{ wireguard_ip }}/privateKey') }}"
+      server:
+        publicKey: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/publicKey') }}"
+        endpoint: "{{ lookup('file', '{{ role_path }}/files/10.202.0.1/endpoint') }}"
+      peers: "{{ peers }}"
+    become: yes
+  when: "'master' not in group_names or 'edge' in group_names"
 
 
 - name: start wireguard

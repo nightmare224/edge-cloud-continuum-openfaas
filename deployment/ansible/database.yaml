@@ -1,5 +1,5 @@
 - name: Include common role for general setup
-  hosts: database, cloud
+  hosts: database, cloud, edge
   roles:
     - role: common
 
@@ -7,7 +7,7 @@
   ansible.builtin.import_playbook: topology.yaml
 
 - name: Setup Wireguard
-  hosts: database, cloud
+  hosts: database, cloud, edge
   tasks:
     - name: Check if wiregurad is set
       command: ip a show dev wg0
@@ -25,11 +25,16 @@
 - name: Install minio
   hosts: database
   tasks:
+  - name: Check if the minio exists
+    stat:
+      path: /home/{{ ansible_host }}/app/minio
+    register: minio
   - name: Download minio
     ansible.builtin.get_url:
       url: https://dl.min.io/server/minio/release/linux-arm64/minio
       dest: /home/{{ ansible_host }}/app/minio
       mode: '0775'
+    when: not minio.stat.exists
   - name: Run minio
     shell: MINIO_ROOT_USER={{ MINIO_ROOT_USER }} MINIO_ROOT_PASSWORD={{ MINIO_ROOT_PASSWORD }} ./minio server /mnt/data --console-address ":9001" &
     args:
