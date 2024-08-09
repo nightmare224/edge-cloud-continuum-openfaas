@@ -87,7 +87,7 @@ data:
             serverity: major
             receiver: scale
         - alert: IdleService
-          expr: (sum by (function_name) (increase(gateway_functions_seconds_count{code="200"}[30s]) == 0)) + (sum by (function_name) (gateway_available_service_count) > 0) + (sum by (function_name) (gateway_service_count) > 1)
+          expr: (sum by (function_name) (increase(gateway_functions_seconds_count{code="200"}[120s]) == 0)) + (sum by (function_name) (gateway_available_service_count) > 0) + (sum by (function_name) (gateway_service_count) > 1)
           for: 20s
           labels:
             service: gateway
