@@ -64,7 +64,7 @@ gatewayPro:
 
 gateway:
   # image: ghcr.io/openfaas/gateway:0.27.6
-  image: nightmare224/faas-gateway-offload:0.0.14
+  image: nightmare224/faas-gateway-offload:1.0.0
   readTimeout: "5m05s"
   writeTimeout: "5m05s"
   upstreamTimeout: "5m"  # Must be smaller than read/write_timeout
@@ -189,7 +189,7 @@ faasnetesOem:
 # For the Community Edition
 faasnetes:
   # image: ghcr.io/openfaas/faas-netes:0.18.3
-  image: docker.io/nightmare224/faas-netes-offload:0.0.42
+  image: docker.io/nightmare224/faas-netes-offload:1.0.0
   resources:
     requests:
       memory: "120Mi"
@@ -427,10 +427,6 @@ k8sVersionOverride: "" #  Allow kubeVersion to be overridden for the ingress cre
 
 offload:  # the secret name is coneconfig
   enabled: true
-  # hostalias:
-  # - ip: 10.211.55.24
-  #   hostname: gateway.openfaas.cloud
-
 
 p2p:
   enabled: true
