@@ -1,6 +1,7 @@
 ---
 - name: Create symbolic link
   hosts: localhost
+  gather_facts: no
   tasks:
     - name: Create file
       file:
@@ -13,6 +14,12 @@
         state: link
 
 - name: Deploy openfaas workload
-  hosts: cloud:&master
+  hosts: 
+    - cloud:&master
+    # - peerA-1
+    # - peerA-2
+    # - peerB-1
+    # - peerB-2
+  gather_facts: no
   roles:
     - role: workload

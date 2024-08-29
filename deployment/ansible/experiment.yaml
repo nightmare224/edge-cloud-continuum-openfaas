@@ -4,9 +4,8 @@
   tasks:
     - command: ctr image pull {{ item }}  
       loop:
-        # - docker.io/nightmare224/matrix-multiplication:latest
-        - docker.io/nightmare224/floating-point-operation-sine:latest
-        # - docker.io/nightmare224/sorter:latest
+        # - docker.io/nightmare224/floating-point-operation-sine:latest
+        - docker.io/nightmare224/resize-image:latest
   become: yes
 
 - name: Install faas-cli
@@ -32,20 +31,16 @@
       command: faas-cli login --gateway http://{{ ansible_host }}:{{ faasgateway_port }} --password {{ slurped_password.content | b64decode }}
       delegate_to: localhost
 
-- name: Remove openfaas function on edge
-  hosts: edge:&master
+- name: Remove all openfaas function
+  hosts: all:&master
   tasks:
     - name: Remove openfaas function on edge
       command: faas-cli remove --gateway http://{{ ansible_host }}:{{ faasgateway_port }} -f ./roles/workload/files/workload/stack.yaml
       delegate_to: localhost
+    - name: Wait for delete
+      ansible.builtin.pause:
+        seconds: 10
 
 - name: Include workload playbook
   ansible.builtin.import_playbook: workload.yaml
 
-# - name: Trigger experiment
-#   hosts: localhost
-#   tasks:
-#     - command: trigger.sh
-    
-#   vars:
-#     user_max: 10

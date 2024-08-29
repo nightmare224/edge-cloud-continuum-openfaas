@@ -74,10 +74,3 @@
   args:
     chdir: /home/{{ ansible_user }}/app/faasd
   tags: faasd_update
-  
-# don't know why it will not work for the first time, require restart
-# - name: Restart faasd provider
-#   ansible.builtin.systemd_service:
-#     state: restarted
-#     daemon_reload: true
-#     name: faasd-provider

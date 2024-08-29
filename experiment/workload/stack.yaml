@@ -16,6 +16,17 @@ functions:
       com.openfaas.scale.min: 1
     build_args:
       ADDITIONAL_PACKAGE: "libgl1"
+  floating-point-operation-sine:
+    # lang: python3-debian
+    lang: dockerfile
+    handler: ./floating-point-operation-sine
+    image: nightmare224/floating-point-operation-sine:latest
+    environment:
+      read_timeout: 0
+      write_timeout: 0
+      exec_timeout: 0
+    labels:
+      com.openfaas.scale.min: 1
   # memory-allocation:
   #   lang: python3-debian
   #   # lang: dockerfile
@@ -32,17 +43,6 @@ functions:
   #   lang: dockerfile
   #   handler: ./matrix-multiplication
   #   image: nightmare224/matrix-multiplication:latest
-  #   environment:
-  #     read_timeout: 0
-  #     write_timeout: 0
-  #     exec_timeout: 0
-  #   labels:
-  #     com.openfaas.scale.min: 1
-  # floating-point-operation-sine:
-  #   # lang: python3-debian
-  #   lang: dockerfile
-  #   handler: ./floating-point-operation-sine
-  #   image: nightmare224/floating-point-operation-sine:latest
   #   environment:
   #     read_timeout: 0
   #     write_timeout: 0

@@ -66,8 +66,6 @@
 
 - name: Install OpenFaaS on Kubernetes
   hosts: master:&openfaas
-    # - on_premise:&master
-    # - aks
   gather_facts: no
   roles:
     - openfaas
